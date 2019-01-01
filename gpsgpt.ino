@@ -12,10 +12,8 @@ uint32_t gpt_ticks() {
 
 volatile uint32_t tick, ticks;
 void pinisr() {
-  GPIO2_ISR |= 1 << 1; // clear interrupt
   tick = 1;
   ticks = gpt_ticks();
-  while (GPIO2_ISR & (1 << 1)); // wait for clear
 }
 
 void setup() {
