@@ -6,7 +6,7 @@ void setup() {
   while (!Serial);
   delay(2000);
   Serial.println();
-  Serial.print(F_CPU); Serial.print(" ");
+  Serial.print(F_CPU_ACTUAL); Serial.print(" ");
 //  Serial.print(F_BUS); Serial.print(" ");
   Serial.println(__TIME__ " " __DATE__);
   PRREG(CCM_ANALOG_PLL_ARM);
