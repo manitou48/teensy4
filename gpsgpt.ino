@@ -10,7 +10,7 @@
 #define PREDIV 23
 #elif CLKSRC == 4
 #define TPS 32768
-#define PREDVI 0
+#define PREDIV 0
 #else
 #error choose CLKSRC 1 or 4
 #endif
