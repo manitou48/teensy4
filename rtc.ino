@@ -1,4 +1,5 @@
 // T4 RTC  32khz crystal  LPSRTC   start and sync HPRTC too ?
+extern void *__rtc_localtime; // Arduino build process sets this, boards.txt
 
 #define SNVS_DEFAULT_PGD_VALUE (0x41736166U)
 #define SNVS_LPSR_PGD_MASK                       (0x8U)
@@ -16,8 +17,8 @@ void rtc_init() {
   while (!(SNVS_LPCR & 1));
 }
 
-void rtc_set_time() {
-  uint32_t secs = 1547051415;
+void rtc_set_time(uint32_t secs) {
+
   SNVS_LPCR &= ~1;   // stop RTC
   while (SNVS_LPCR & 1);
   SNVS_LPSRTCMR = (uint32_t)(secs >> 17U);
@@ -46,11 +47,10 @@ void setup() {
   while (!Serial);
   delay(2000);
   rtc_init();
-  rtc_set_time();   //LPSRTC will start at 0 otherwise
+  rtc_set_time((uint32_t)&__rtc_localtime);   //LPSRTC will start at 0 otherwise  1547051415;
 }
 
 void loop() {
   Serial.println(rtc_secs());
   delay(1000);
-
 }
