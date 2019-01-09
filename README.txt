@@ -2,6 +2,8 @@ Teensy 4 sketches and such    https://github.com/manitou48/teensy4
 
 gpsgpt.ino     measure crystal drift of 24mhz and 32khz crystal with GPT
 
+rtc.ino        RTC off of 32 khz crystal
+
 sysinfo.ino    teensy 4 core registers
 
 --------
