@@ -21,8 +21,6 @@ void setupADC(int pin)
   // conversion.  This completes the self calibration stuff and
   // leaves the ADC in a state that's mostly ready to use
   analogReadRes(10);
-  // analogReference(INTERNAL); // range 0 to 1.2 volts
-  //analogReference(DEFAULT); // range 0 to 3.3 volts
   analogReadAveraging(1);
   // Actually, do many normal reads, to start with a nice DC level
   uint32_t us = micros();
@@ -34,7 +32,6 @@ void setupADC(int pin)
   Serial.print(t); Serial.println(" us");
   dc_average = sum >> 10;
   Serial.println(dc_average);
-
 
   // enable the ADC for DMA
   ADC1_GC |= ADC_GC_DMAEN | ADC_GC_ADCO;
@@ -54,7 +51,7 @@ void setupADC(int pin)
   dma.attachInterrupt(isr);
 
   ADC1_GC |= ADC_GC_ADACKEN;
-  ADC1_HC0 = 7;
+  ADC1_HC0 = 7;   // need pin_to_channel table analog.c
 }
 
 volatile uint32_t ticks;
@@ -74,8 +71,8 @@ void setup()
 void loop()
 {
   static int prev;
-  Serial.println(ticks - prev);
-  Serial.println(analog_rx_buffer[13]);
+
+  Serial.printf("%d ticks A0 = %d \n", ticks - prev, analog_rx_buffer[13]);
   prev = ticks;
   delay(2000);
 }
