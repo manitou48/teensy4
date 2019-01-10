@@ -1,10 +1,10 @@
 //  https://forum.pjrc.com/threads/24963-Teensy-3-1-ADC-with-DMA
-// T4 A0 ADC1 7
+// T4 A0 ADC1 7   A1 ch 8
 #include <DMAChannel.h>
 #define PRREG(x) Serial.print(#x" 0x"); Serial.println(x,HEX)
 #define AUDIO_BLOCK_SAMPLES 1024
 
-DMAMEM static uint16_t analog_rx_buffer[AUDIO_BLOCK_SAMPLES];
+/*DMAMEM*/ static uint16_t analog_rx_buffer[AUDIO_BLOCK_SAMPLES];
 DMAChannel dma(false);
 uint16_t dc_average;
 
