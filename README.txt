@@ -8,6 +8,8 @@ gpt_micros.ino GPT1 micros (core micros only 10 us res)
 
 rtc.ino        RTC off of 32 khz crystal
 
+spidma.ino     SPI DMA transmit
+
 sysinfo.ino    teensy 4 core registers
 
 --------
