@@ -54,6 +54,7 @@ void setupADC(int pin)
   dma.attachInterrupt(isr);
 
   ADC1_GC |= ADC_GC_ADACKEN;
+  ADC1_HC0 = 7;
 }
 
 volatile uint32_t ticks;
