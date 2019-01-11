@@ -17,7 +17,6 @@ void isr(void)
   ticks++;
 }
 
-
 void spidma()
 {
   LPSPI4_CR &= ~LPSPI_CR_MEN;//disable LPSPI:
@@ -33,13 +32,15 @@ void spidma()
   dma.sourceBuffer(tx_buffer, sizeof(tx_buffer));
 
   dma.TCD->CSR = DMA_TCD_CSR_INTMAJOR;
-
+  dma.enable();
   dma.attachInterrupt(isr);
+  digitalWrite(CS, LOW);
   uint32_t t = micros();
-  dma.enable();// start
+  dma.triggerAtHardwareEvent( DMAMUX_SOURCE_LPSPI4_TX );  // start
   while (ticks == 0) ;
   t = micros() - t;
-  Serial.printf("tx %d samples %d us\n", SAMPLES, t);
+  digitalWrite(CS, HIGH);
+  Serial.printf("tx %d samples %d us  %.1f mbs\n", SAMPLES, t, 8.*SAMPLES / t);
 }
 
 void setup()
@@ -47,16 +48,18 @@ void setup()
   Serial.begin(9600);
   while (!Serial);
   delay(1000);
+  pinMode(CS, OUTPUT);
+  digitalWrite(CS, HIGH);
   Serial.println("SPI DMA");
   SPI.begin();
   SPI.beginTransaction(SPISettings(SPICLOCK, MSBFIRST, SPI_MODE0));
-  Serial.printf("begin SPI clock %d\n", SPICLOCK);
+
   //LPSPI4_CCR = 1;   // DIV  + 2
   // LPSPI4_TCR = 31;   // frame
   PRREG(LPSPI4_CCR);
   PRREG(LPSPI4_TCR);
   PRREG(LPSPI4_FCR);
-  Serial.printf("CCR freq %.1f MHz\n", 528. / 7 / ((0xff & LPSPI4_CCR) + 2));
+  Serial.printf("SPI CLOCK %d CCR freq %.1f MHz\n", SPICLOCK, 528. / 7 / ((0xff & LPSPI4_CCR) + 2));
 
   spidma();
 }
