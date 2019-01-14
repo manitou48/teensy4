@@ -1,5 +1,7 @@
 Teensy 4 sketches and such    https://github.com/manitou48/teensy4
 
+acmpdac.ino    ACMP3 and DAC example
+
 adcdma.ino     continuous ADC and DMA
 
 gpsgpt.ino     measure crystal drift of 24mhz and 32khz crystal with GPT
