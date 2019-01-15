@@ -1,18 +1,20 @@
 Teensy 4 sketches and such    https://github.com/manitou48/teensy4
 
-acmpdac.ino    ACMP3 and DAC example
+acmpdac.ino       ACMP3 and DAC example
 
-adcdma.ino     continuous ADC and DMA
+adcdma.ino        continuous ADC and DMA
 
-gpsgpt.ino     measure crystal drift of 24mhz and 32khz crystal with GPT
+gpsgpt.ino        measure crystal drift of 24mhz and 32khz crystal with GPT
 
-gpt_micros.ino GPT1 micros (core micros only 10 us res)
+gpt_capture.ino   GPT1 input capture of GPS PPS signal, drift check 24mhz or 32khz
 
-rtc.ino        RTC off of 32 khz crystal
+gpt_micros.ino    GPT1 micros (core micros only 10 us res)
 
-spidma.ino     SPI DMA transmit
+rtc.ino           RTC off of 32 khz crystal
 
-sysinfo.ino    teensy 4 core registers
+spidma.ino        SPI DMA transmit
+
+sysinfo.ino       teensy 4 core registers
 
 --------
 Some performance comparisons at
