@@ -8,6 +8,8 @@ gpsgpt.ino        measure crystal drift of 24mhz and 32khz crystal with GPT
 
 gpt_capture.ino   GPT1 input capture of GPS PPS signal, drift check 24mhz or 32khz
 
+gpt_count.ino     GPT1 clocked from pin 25, like FreqCount
+
 gpt_micros.ino    GPT1 micros (core micros only 10 us res)
 
 rtc.ino           RTC off of 32 khz crystal
