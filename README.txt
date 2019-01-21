@@ -20,6 +20,8 @@ spidma.ino        SPI DMA transmit
 
 sysinfo.ino       teensy 4 core registers
 
+trng.ino          hardware TRNG example, 512 bits in 52 ms
+
 --------
 Some performance comparisons at
 
