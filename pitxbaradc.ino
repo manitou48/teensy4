@@ -86,7 +86,7 @@ void setup() {
 
 void loop() {
   Serial.printf("%d  %d\n", val0, val1);
-  Serial.println(ticks);
+
   delay(2000);
 
 }
