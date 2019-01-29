@@ -12,6 +12,8 @@ gpt_count.ino     GPT1 clocked from pin 25, like FreqCount
 
 gpt_micros.ino    GPT1 micros (core micros only 10 us res)
 
+pitxbaradc.ino    clock ADC reads with PIT via XBAR
+
 rtc.ino           RTC off of 32 khz crystal
 
 rtchp.ino         HP RTC off of 32 khz crystal, periodic sub-second alarm
