@@ -27,6 +27,7 @@ void adc_init() {
 }
 
 void adc_etc_init() {
+  ADC_ETC_CTRL &= ~(1 << 31); // SOFTRST
   ADC_ETC_CTRL = 0x40000001;
   ADC_ETC_TRIG0_CTRL = 0x100;
   ADC_ETC_TRIG0_CHAIN_1_0 = 0x50283017;   // ADC1 7 8
@@ -34,7 +35,6 @@ void adc_etc_init() {
   NVIC_ENABLE_IRQ(IRQ_ADC_ETC0);
   attachInterruptVector(IRQ_ADC_ETC1, adcetc1_isr);
   NVIC_ENABLE_IRQ(IRQ_ADC_ETC1);
-  ADC_ETC_CTRL = 0x40000001;   // ? need to set low order bit again?
 }
 
 void xbar_connect(unsigned int input, unsigned int output)
@@ -72,21 +72,17 @@ void setup() {
   xbar_init();
   adc_init();
   adc_etc_init();
-
   pit_init(24 * 1000000);
+
   PRREG(ADC1_CFG);
   PRREG(ADC1_HC0);
   PRREG(ADC1_HC1);
-
   PRREG(ADC_ETC_CTRL);
   PRREG(ADC_ETC_TRIG0_CTRL);
   PRREG(ADC_ETC_TRIG0_CHAIN_1_0);
-
 }
 
 void loop() {
   Serial.printf("%d  %d\n", val0, val1);
-
   delay(2000);
-
 }
