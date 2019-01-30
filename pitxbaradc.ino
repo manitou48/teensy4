@@ -28,9 +28,9 @@ void adc_init() {
 
 void adc_etc_init() {
   ADC_ETC_CTRL &= ~(1 << 31); // SOFTRST
-  ADC_ETC_CTRL = 0x40000001;
-  ADC_ETC_TRIG0_CTRL = 0x100;
-  ADC_ETC_TRIG0_CHAIN_1_0 = 0x50283017;   // ADC1 7 8
+  ADC_ETC_CTRL = 0x40000001;  // start with trigger 0
+  ADC_ETC_TRIG0_CTRL = 0x100;   // chainlength -1
+  ADC_ETC_TRIG0_CHAIN_1_0 = 0x50283017;   // ADC1 7 8, chain channel, HWTS, IE, B2B
   attachInterruptVector(IRQ_ADC_ETC0, adcetc0_isr);
   NVIC_ENABLE_IRQ(IRQ_ADC_ETC0);
   attachInterruptVector(IRQ_ADC_ETC1, adcetc1_isr);
