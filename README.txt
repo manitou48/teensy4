@@ -19,6 +19,7 @@ rtc.ino           RTC off of 32 khz crystal
 rtchp.ino         HP RTC off of 32 khz crystal, periodic sub-second alarm
 
 spidma.ino        SPI DMA transmit
+spidma2.ino       SPI DMA transmit and receive
 
 sysinfo.ino       teensy 4 core registers
 
