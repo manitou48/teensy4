@@ -14,7 +14,7 @@ void setup() {
   CCM_CS1CDR |= CCM_CS1CDR_FLEXIO2_CLK_PODF(7) | CCM_CS1CDR_FLEXIO2_CLK_PRED(5);
   int flexhz = 480000000 / 8 / 6;   // 480mhz
   int sum = (flexhz * 2 / PWMHZ + 1) / 2;
-  int duty = 50;
+  int duty = 100 - 25;    // 25% high
   int locnt = (sum * duty / 50 + 1) / 2;
   int hicnt = sum - locnt;
   FLEXIO2_TIMCMP0 = ((locnt - 1) << 8 ) | (hicnt - 1);
