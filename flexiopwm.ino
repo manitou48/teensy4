@@ -10,8 +10,8 @@ void setup() {
   while (!Serial);
   delay(1000);
   CCM_CCGR3 |= CCM_CCGR3_FLEXIO2(CCM_CCGR_ON);
-  CCM_CS1CDR |= CCM_CS1CDR_FLEXIO2_CLK_PODF(7) | CCM_CS1CDR_FLEXIO2_CLK_PRED(4);
-  int flexhz = 400000000 / 8 / 5;   // not 480mhz but 4000 mhz
+  CCM_CS1CDR |= CCM_CS1CDR_FLEXIO2_CLK_PODF(7) | CCM_CS1CDR_FLEXIO2_CLK_PRED(5);
+  int flexhz = 480000000 / 8 / 6;   // 480mhz
   int sum = (flexhz * 2 / PWMHZ + 1) / 2;
   int duty = 50;
   int locnt = (sum * duty / 50 + 1) / 2;
