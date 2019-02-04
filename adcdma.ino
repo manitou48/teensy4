@@ -2,9 +2,9 @@
 // T4 A0 ADC1 7   A1 ch 8
 #include <DMAChannel.h>
 #define PRREG(x) Serial.print(#x" 0x"); Serial.println(x,HEX)
-#define AUDIO_BLOCK_SAMPLES 1024
+#define SAMPLES 1024
 
-/*DMAMEM*/ static uint16_t analog_rx_buffer[AUDIO_BLOCK_SAMPLES];
+/*DMAMEM*/ static uint16_t rx_buffer[SAMPLES];
 DMAChannel dma(false);
 uint16_t dc_average;
 
@@ -39,11 +39,12 @@ void setupADC(int pin)
   PRREG(ADC1_GC);
   PRREG(ADC1_HC0);
   PRREG(ADC1_CFG);
+  Serial.printf("buff addr %x\n", (uint32_t)rx_buffer);
 
   // set up a DMA channel to store the ADC data
   dma.begin(true); // Allocate the DMA channel first
   dma.source((uint16_t &) ADC1_R0);
-  dma.destinationBuffer(analog_rx_buffer, sizeof(analog_rx_buffer));
+  dma.destinationBuffer(rx_buffer, sizeof(rx_buffer));
 
   dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
   dma.triggerAtHardwareEvent(DMAMUX_SOURCE_ADC1);
@@ -72,7 +73,7 @@ void loop()
 {
   static int prev;
 
-  Serial.printf("%d ticks A0 = %d \n", ticks - prev, analog_rx_buffer[13]);
+  Serial.printf("%d ticks A0 = %d \n", ticks - prev, rx_buffer[13]);
   prev = ticks;
   delay(2000);
 }
