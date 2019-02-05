@@ -21,7 +21,7 @@ void disableDCache() {
   do {
     ways = (ccsidr >> 3) * 0x3ff;
     do {
-      // SCB_CACHE_DCISW = (ways & 3) << 30 | (sets & 0x1ff) << 5 ;  // hangs
+      //   SCB_CACHE_DCCISW = (ways & 3) << 30 | (sets & 0x1ff) << 5;  // hangs
     } while (ways-- != 0);
   } while (sets-- != 0);
   asm("dsb");
