@@ -10,15 +10,13 @@
 #define SCB_CSSELR       (*(volatile    uint32_t *)0xE000ED84) // Cache Size Selection
 
 void disableDCache() {
-  uint32_t ccsidr, sets, ways, lines, linesz;
+  uint32_t ccsidr, sets, ways;
   SCB_CSSELR = 0;     // L1 D cache   ?? compile error read only for _ID_ version
   asm("dsb");
   SCB_CCR &= ~SCB_CCR_DC;   // disable D cache
   asm("dsb");
   // clean and invalidate D cache
   ccsidr = SCB_ID_CCSIDR;
-  linesz = ccsidr & 7;  // 1 is 32 bytes
-  lines = 4;
   sets = (ccsidr >> 13) & 0x7fff;
   do {
     ways = (ccsidr >> 3) * 0x3ff;
@@ -47,7 +45,7 @@ float  sdot(float *a, float *b, int n) {
 void setup() {
   float a[XN], b[XN], r, *am, *bm; // more than 32KB
 
-  disableDCache();  // ? halts
+  disableDCache();  // or not
   Serial.begin(9600);
   while (!Serial);
   delay(1000);
