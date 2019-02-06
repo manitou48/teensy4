@@ -4,6 +4,8 @@ acmpdac.ino       ACMP3 and DAC example
 
 adcdma.ino        continuous ADC and DMA
 
+cachetst          cache/no-cache from stack, OCRAM, PROGMEM
+
 flexiopwm.ino     flexio PWM 400mhz clock?
 
 gpsgpt.ino        measure crystal drift of 24mhz and 32khz crystal with GPT
