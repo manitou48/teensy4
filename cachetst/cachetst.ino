@@ -28,7 +28,6 @@ void disableDCache() {
   } while (sets-- != 0);
   asm("dsb");
   asm("isb");
-
 }
 
 float  sdot(float *a, float *b, int n, char *memlbl) {
@@ -43,16 +42,22 @@ float  sdot(float *a, float *b, int n, char *memlbl) {
   return sum;
 }
 
-
 void setup() {
   float a[XN], b[XN], r, *am, *bm; // more than 32KB
-
 
   Serial.begin(9600);
   while (!Serial);
   delay(1000);
+#if 1
   am = (float *) malloc(XN * 4);
   bm = (float *) malloc(XN * 4);
+#else
+  const int bufalign = 32; //alignment of buffer cache line 32
+  am = (float * )malloc(XN * 4 + bufalign);
+  am = (float *) (((uintptr_t)am + bufalign) & ~ ((uintptr_t) (bufalign - 1 )));
+  bm = (float * )malloc(XN * 4 + bufalign);
+  bm = (float *) (((uintptr_t)bm + bufalign) & ~ ((uintptr_t) (bufalign - 1 )));
+#endif
   for (int i = 0; i < XN; i++) a[i] = b[i] = am[i] = bm[i] = ap[i];
   PRREG(SCB_CCR);
   PRREG(SCB_ID_CCSIDR);
