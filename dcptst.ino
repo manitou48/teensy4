@@ -7,6 +7,11 @@
 #define DCP_CH0SEMA_VALUE_MASK                   (0xFF0000U)
 #define DCP_CH0STAT_ERROR_CODE_MASK              (0xFF0000U)
 #define DCP_HASH_BLOCK_SIZE  128
+#define DCP_STAT_OTP_KEY_READY_MASK              (0x10000000U)
+#define DCP_KEY_INDEX_MASK                       (0x30U)
+#define DCP_KEY_INDEX_SHIFT                      (4U)
+#define DCP_KEY_INDEX(x)                         (((uint32_t)(((uint32_t)(x)) << DCP_KEY_INDEX_SHIFT)) & DCP_KEY_INDEX_MASK)
+
 
 enum _generic_status
 {
@@ -604,10 +609,253 @@ void do_sha256() {
   DCP_HASH_Update( &hashCtx, msg, sizeof(msg));
   DCP_HASH_Finish( &hashCtx, hash);
   t = micros() - t;
-  Serial.printf("%d bytes %d us  %.3f MBs\n", sizeof(msg), t, (float)sizeof(msg) / t);
+  Serial.printf("SHA256 %d bytes %d us  %.3f MBs\n", sizeof(msg), t, (float)sizeof(msg) / t);
   prhash(hash, 32);
 }
 
+uint32_t dcp_aes_set_sram_based_key( dcp_handle_t *handle, const uint8_t *key)
+{
+  DCP->KEY = DCP_KEY_INDEX(handle->keySlot);
+  /* move the key by 32-bit words */
+  int i = 0;
+  size_t keySize = 16u;
+  while (keySize)
+  {
+    keySize -= sizeof(uint32_t);
+    DCP->KEYDATA = ((uint32_t *)(uintptr_t)key)[i];
+    i++;
+  }
+  return kStatus_Success;
+}
+
+uint32_t DCP_AES_EncryptCbcNonBlocking(
+  dcp_handle_t *handle,
+  dcp_work_packet_t *dcpPacket,
+  const uint8_t *plaintext,
+  uint8_t *ciphertext,
+  size_t size,
+  const uint8_t *iv)
+{
+  /* Size must be 16-byte multiple */
+  if ((size < 16u) || (size % 16u))
+  {
+    return kStatus_InvalidArgument;
+  }
+
+  dcpPacket->control0 =
+    0x322u | (handle->swapConfig & 0xFC0000u); /* CIPHER_INIT | CIPHER_ENCRYPT | ENABLE_CIPHER | DECR_SEMAPHORE */
+  dcpPacket->control1 = 0x10u;                   /* CBC */
+  dcpPacket->sourceBufferAddress = (uint32_t)plaintext;
+  dcpPacket->destinationBufferAddress = (uint32_t)ciphertext;
+  dcpPacket->bufferSize = (uint32_t)size;
+
+  if (handle->keySlot == kDCP_OtpKey)
+  {
+    dcpPacket->payloadPointer = (uint32_t)iv;
+    dcpPacket->control0 |= (1u << 10);   /* OTP_KEY */
+    dcpPacket->control1 |= (0xFFu << 8); /* KEY_SELECT = OTP_KEY */
+  }
+  else if (handle->keySlot == kDCP_OtpUniqueKey)
+  {
+    dcpPacket->payloadPointer = (uint32_t)iv;
+    dcpPacket->control0 |= (1u << 10);   /* OTP_KEY */
+    dcpPacket->control1 |= (0xFEu << 8); /* KEY_SELECT = UNIQUE_KEY */
+  }
+  else if (handle->keySlot == kDCP_PayloadKey)
+  {
+    /* In this case payload must contain key & iv in one array. */
+    /* Copy iv into handle right behind the keyWord[] so we can point payload to keyWord[]. */
+    memcpy(handle->iv, iv, 16);
+    dcpPacket->payloadPointer = (uint32_t)&handle->keyWord[0];
+    dcpPacket->control0 |= (1u << 11); /* PAYLOAD_KEY */
+  }
+  else
+  {
+    dcpPacket->payloadPointer = (uint32_t)iv;
+    dcpPacket->control1 |= ((uint32_t)handle->keySlot << 8); /* KEY_SELECT = keySlot */
+  }
+
+  return dcp_schedule_work( handle, dcpPacket);
+}
+
+uint32_t DCP_AES_DecryptCbcNonBlocking(
+  dcp_handle_t *handle,
+  dcp_work_packet_t *dcpPacket,
+  const uint8_t *ciphertext,
+  uint8_t *plaintext,
+  size_t size,
+  const uint8_t *iv)
+{
+  /* Size must be 16-byte multiple */
+  if ((size < 16u) || (size % 16u))
+  {
+    return kStatus_InvalidArgument;
+  }
+
+  dcpPacket->control0 = 0x222u | (handle->swapConfig & 0xFC0000u); /* CIPHER_INIT | ENABLE_CIPHER | DECR_SEMAPHORE */
+  dcpPacket->control1 = 0x10u;                                     /* CBC */
+  dcpPacket->sourceBufferAddress = (uint32_t)ciphertext;
+  dcpPacket->destinationBufferAddress = (uint32_t)plaintext;
+  dcpPacket->bufferSize = (uint32_t)size;
+
+  if (handle->keySlot == kDCP_OtpKey)
+  {
+    dcpPacket->payloadPointer = (uint32_t)iv;
+    dcpPacket->control0 |= (1u << 10);   /* OTP_KEY */
+    dcpPacket->control1 |= (0xFFu << 8); /* OTP_KEY */
+  }
+  else if (handle->keySlot == kDCP_OtpUniqueKey)
+  {
+    dcpPacket->payloadPointer = (uint32_t)iv;
+    dcpPacket->control0 |= (1u << 10);   /* OTP_KEY */
+    dcpPacket->control1 |= (0xFEu << 8); /* UNIQUE_KEY */
+  }
+  else if (handle->keySlot == kDCP_PayloadKey)
+  {
+    /* in this case payload must contain KEY + IV together */
+    /* copy iv into handle struct so we can point payload directly to keyWord[]. */
+    memcpy(handle->iv, iv, 16);
+    dcpPacket->payloadPointer = (uint32_t)&handle->keyWord[0];
+    dcpPacket->control0 |= (1u << 11); /* PAYLOAD_KEY */
+  }
+  else
+  {
+    dcpPacket->payloadPointer = (uint32_t)iv;
+    dcpPacket->control1 |= ((uint32_t)handle->keySlot << 8); /* KEY_SELECT */
+  }
+
+  return dcp_schedule_work( handle, dcpPacket);
+}
+
+uint32_t DCP_AES_SetKey( dcp_handle_t *handle, const uint8_t *key, size_t keySize)
+{
+  uint32_t status = kStatus_Fail;
+
+  if ((kDCP_OtpKey == handle->keySlot) || (kDCP_OtpUniqueKey == handle->keySlot))
+  {
+    /* for AES OTP and unique key, check and return read from fuses status */
+    if ((DCP->STAT & DCP_STAT_OTP_KEY_READY_MASK) == DCP_STAT_OTP_KEY_READY_MASK)
+    {
+      status = kStatus_Success;
+    }
+  }
+  else
+  {
+    /* only work with aligned key[] */
+    if (0x3U & (uintptr_t)key)
+    {
+      return kStatus_InvalidArgument;
+    }
+
+    /* keySize must be 16. */
+    if (keySize != 16U)
+    {
+      return kStatus_InvalidArgument;
+    }
+
+    /* move the key by 32-bit words */
+    int i = 0;
+    while (keySize)
+    {
+      keySize -= sizeof(uint32_t);
+      handle->keyWord[i] = ((uint32_t *)(uintptr_t)key)[i];
+      i++;
+    }
+
+    if (kDCP_PayloadKey != handle->keySlot)
+    {
+      /* move the key by 32-bit words to DCP SRAM-based key storage */
+      status = dcp_aes_set_sram_based_key(handle, key);
+    }
+    else
+    {
+      /* for PAYLOAD_KEY, just return Ok status now */
+      status = kStatus_Success;
+    }
+  }
+  return status;
+}
+
+void DCP_AES_EncryptCbc(
+  dcp_handle_t *handle,
+  const uint8_t *plaintext,
+  uint8_t *ciphertext,
+  size_t size,
+  const uint8_t iv[16])
+{
+  uint32_t completionStatus = kStatus_Fail;
+  dcp_work_packet_t dcpWork = {0};
+
+  do
+  {
+    completionStatus = DCP_AES_EncryptCbcNonBlocking(handle, &dcpWork, plaintext, ciphertext, size, iv);
+  } while (completionStatus == kStatus_DCP_Again);
+
+  if (completionStatus != kStatus_Success)
+  {
+    return ; //completionStatus;
+  }
+
+  DCP_WaitForChannelComplete( handle);
+}
+
+void DCP_AES_DecryptCbc(
+  dcp_handle_t *handle,
+  const uint8_t *ciphertext,
+  uint8_t *plaintext,
+  size_t size,
+  const uint8_t iv[16])
+{
+  uint32_t completionStatus = kStatus_Fail;
+  dcp_work_packet_t dcpWork = {0};
+
+  do
+  {
+    completionStatus = DCP_AES_DecryptCbcNonBlocking( handle, &dcpWork, ciphertext, plaintext, size, iv);
+  } while (completionStatus == kStatus_DCP_Again);
+
+  if (completionStatus != kStatus_Success)
+  {
+    return; // completionStatus;
+  }
+
+  DCP_WaitForChannelComplete( handle);
+}
+
+
+void do_aes() {
+  static const uint8_t keyAes128[] __attribute__((aligned)) =
+  { 0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6,
+    0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c
+  };
+  static const uint8_t plainAes128[] =
+  { 0x6b, 0xc1, 0xbe, 0xe2, 0x2e, 0x40, 0x9f, 0x96,
+    0xe9, 0x3d, 0x7e, 0x11, 0x73, 0x93, 0x17, 0x2a
+  };
+  static const uint8_t ive[] =
+  { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+    0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
+  };
+
+  static const uint8_t cipherAes128[] =
+  { 0x76, 0x49, 0xab, 0xac, 0x81, 0x19, 0xb2, 0x46,
+    0xce, 0xe9, 0x8e, 0x9b, 0x12, 0xe9, 0x19, 0x7d
+  };
+  uint8_t cipher[16], output[16], inmsg[1024], cipherout[1024];
+  dcp_handle_t m_handle;
+
+  m_handle.channel = kDCP_Channel0;
+  m_handle.swapConfig = kDCP_NoSwap;
+  m_handle.keySlot = kDCP_KeySlot0;    // could use OTP key
+  DCP_AES_SetKey(&m_handle, keyAes128, 16);
+  DCP_AES_EncryptCbc(&m_handle, plainAes128, cipher, 16, ive);
+  DCP_AES_DecryptCbc(&m_handle, cipher, output, 16, ive);
+  Serial.printf("memcmp %d\n", memcmp(output, plainAes128, 16));
+  uint32_t t = micros();
+  DCP_AES_EncryptCbc(&m_handle, inmsg, cipherout, sizeof(inmsg), ive);
+  t = micros() - t;
+  Serial.printf("AES %d bytes %d us  %.3f MBs\n", sizeof(inmsg), t, (float)sizeof(inmsg) / t);
+}
 
 void setup() {
   Serial.begin(9600);
@@ -615,6 +863,7 @@ void setup() {
   delay(1000);
   dcp_init();
   do_sha256();
+  do_aes();
 
 }
 
