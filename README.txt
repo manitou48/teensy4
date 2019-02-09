@@ -6,7 +6,7 @@ adcdma.ino        continuous ADC and DMA
 
 cachetst          cache/no-cache from stack, OCRAM, PROGMEM
 
-dcptst.ino        DCP proof-of-principle, SHA256 ok, TBD: AES CRC32
+dcptst.ino        DCP proof-of-principle, SHA256 and AES ok, TBD: CRC32
 
 flexiopwm.ino     flexio PWM 400mhz clock?
 
