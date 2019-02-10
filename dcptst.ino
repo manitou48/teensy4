@@ -613,6 +613,32 @@ void do_sha256() {
   prhash(hash, 32);
 }
 
+void do_crc32() {
+  dcp_handle_t m_handle;
+  dcp_hash_ctx_t hashCtx;
+  uint8_t msg[16 * 1024], hash[4];
+  static const uint8_t message[] = "abcdbcdecdefdefgefghfghighijhijk";
+  static const unsigned char crc32[] = {0x7f, 0x04, 0x6a, 0xdd};  // crc
+
+  m_handle.channel = kDCP_Channel0;
+  m_handle.keySlot = kDCP_KeySlot0;
+  m_handle.swapConfig = kDCP_NoSwap;
+
+  DCP_HASH_Init( &m_handle, &hashCtx, kDCP_Crc32);
+  DCP_HASH_Update( &hashCtx, message, sizeof(message) - 1);
+  DCP_HASH_Finish( &hashCtx, hash);
+  Serial.printf("memcmp %d\n", memcmp(hash, crc32, 4));
+  prhash(hash, 4);
+
+  uint32_t t = micros();
+  DCP_HASH_Init( &m_handle, &hashCtx, kDCP_Crc32);
+  DCP_HASH_Update( &hashCtx, msg, sizeof(msg));
+  DCP_HASH_Finish( &hashCtx, hash);
+  t = micros() - t;
+  Serial.printf("CRC32 %d bytes %d us  %.3f MBs\n", sizeof(msg), t, (float)sizeof(msg) / t);
+  prhash(hash, 4);
+}
+
 uint32_t dcp_aes_set_sram_based_key( dcp_handle_t *handle, const uint8_t *key)
 {
   DCP->KEY = DCP_KEY_INDEX(handle->keySlot);
@@ -863,11 +889,10 @@ void setup() {
   delay(1000);
   dcp_init();
   do_sha256();
+  do_crc32();
   do_aes();
-
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
 
 }
