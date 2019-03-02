@@ -20,6 +20,10 @@ gpt_micros.ino    GPT1 micros (core micros only 10 us res)
 
 pitxbaradc.ino    clock ADC reads with PIT via XBAR
 
+qtmr_capture.ino  quad timer capture
+
+qtmrtst.ino       quad timer counting and PWM tests
+
 rtc.ino           RTC off of 32 khz crystal
 
 rtchp.ino         HP RTC off of 32 khz crystal, periodic sub-second alarm
