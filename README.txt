@@ -4,6 +4,8 @@ acmpdac.ino       ACMP3 and DAC example
 
 adcdma.ino        continuous ADC and DMA
 
+adcdmapit.ino     try to add DMA to PIT+XBAR+ADC_ETC+ADC  not working
+
 cachetst          cache/no-cache from stack, OCRAM, PROGMEM
 
 dcptst.ino        DCP proof-of-principle, SHA256, CRC32, and AES 
