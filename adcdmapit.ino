@@ -1,9 +1,11 @@
 // from SDK PIT XBAR ADC_ETC ADC   DMA
 // chain A0  AD_B1_02     ADC1 IN 7
+// TODO not working, DMA trigger ADC no interrupts?
+//   trigger ADC_ETC too many interrupts ??
 #include <DMAChannel.h>
 
 #define PRREG(x) Serial.print(#x" 0x"); Serial.println(x,HEX)
-#define SAMPLES 1024
+#define SAMPLES 256
 
 /*DMAMEM*/ static uint16_t rx_buffer[SAMPLES];
 DMAChannel dma(false);
@@ -18,11 +20,13 @@ void isr(void)
 void dma_init() {
   // set up a DMA channel to store the ADC data
   dma.begin(true); // Allocate the DMA channel first
-  dma.source((uint16_t &) ADC1_R0);
+  //  dma.source((uint16_t &) ADC1_R0);
+  dma.source((uint16_t &) ADC_ETC_TRIG0_RESULT_1_0);  // either works
   dma.destinationBuffer(rx_buffer, sizeof(rx_buffer));
 
   dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;  // double buffer
-  dma.triggerAtHardwareEvent(DMAMUX_SOURCE_ADC1);
+  //dma.triggerAtHardwareEvent(DMAMUX_SOURCE_ADC1);
+  dma.triggerAtHardwareEvent(DMAMUX_SOURCE_ADC_ETC);
 
   dma.attachInterrupt(isr);
   dma.enable();
@@ -33,7 +37,7 @@ void adc_init() {
   analogReadResolution(12);
   analogRead(0);
   analogRead(1);
-  ADC1_CFG |= ADC_CFG_ADTRG | ADC_GC_DMAEN;   // hardware trigger, DMA
+  ADC1_CFG |= ADC_CFG_ADTRG | ADC_GC_DMAEN;   // hardware trigger, DMA?
   // ADC1_CFG = 0x200b;
   ADC1_HC0 = 16;   // ADC_ETC channel
 }
@@ -43,7 +47,7 @@ void adc_etc_init() {
   ADC_ETC_CTRL = 0x40000001;  // start with trigger 0
   ADC_ETC_TRIG0_CTRL = 0;   // chainlength -1
   ADC_ETC_TRIG0_CHAIN_1_0 = 0x1017;   // ADC1 7  chain channel, HWTS,  BB? TODO
-
+  ADC_ETC_DMA_CTRL = 1; // ch 0 enable dma
 }
 
 void xbar_connect(unsigned int input, unsigned int output)
@@ -82,7 +86,7 @@ void setup() {
   adc_init();
   dma_init();
   adc_etc_init();
-  pit_init(24 * 1000);   // 1 khz 
+  pit_init(24 * 1000);   // 1 khz  1000 ADCs/sec
 
   PRREG(ADC1_CFG);
   PRREG(ADC1_HC0);
@@ -92,7 +96,9 @@ void setup() {
 }
 
 void loop() {
+  static uint32_t prev = 0;
   //arm_dcache_delete(rx_buffer, sizeof(rx_buffer));  // needed for DMAMEM ?
-  Serial.printf("%d ticks  %d\n", ticks, rx_buffer[3]);
+  Serial.printf("%d ticks %d   %d\n", ticks, ticks - prev, rx_buffer[3]);
+  prev = ticks;
   delay(2000);
 }
