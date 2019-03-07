@@ -26,4 +26,5 @@ trng.ino       |  hardware TRNG example, 512 bits in 52 ms
 Some performance comparisons at
 
    https://github.com/manitou48/DUEZoo
+
    https://github.com/manitou48/crystals   teensy 3 RTC tuning
