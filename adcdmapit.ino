@@ -15,18 +15,19 @@ void isr(void)
 {
   dma.clearInterrupt();
   ticks++;
+  asm volatile ("dsb");
 }
 
 void dma_init() {
   // set up a DMA channel to store the ADC data
   dma.begin(true); // Allocate the DMA channel first
-  //  dma.source((uint16_t &) ADC1_R0);
-  dma.source((uint16_t &) ADC_ETC_TRIG0_RESULT_1_0);  // either works
+  dma.source((uint16_t &) ADC1_R0);
+  //  dma.source((uint16_t &) ADC_ETC_TRIG0_RESULT_1_0);  // either works
   dma.destinationBuffer(rx_buffer, sizeof(rx_buffer));
 
   dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;  // double buffer
-  //dma.triggerAtHardwareEvent(DMAMUX_SOURCE_ADC1);
-  dma.triggerAtHardwareEvent(DMAMUX_SOURCE_ADC_ETC);
+  dma.triggerAtHardwareEvent(DMAMUX_SOURCE_ADC1);
+  // dma.triggerAtHardwareEvent(DMAMUX_SOURCE_ADC_ETC);
 
   dma.attachInterrupt(isr);
   dma.enable();
