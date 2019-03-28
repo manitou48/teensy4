@@ -4,7 +4,7 @@
 #define PRREG(x) Serial.print(#x" 0x"); Serial.println(x,HEX)
 #define SAMPLES 1024
 
-/*DMAMEM*/ static uint16_t rx_buffer[SAMPLES];
+DMAMEM static uint16_t rx_buffer[SAMPLES];
 DMAChannel dma(false);
 uint16_t dc_average;
 
@@ -35,11 +35,17 @@ void setupADC(int pin)
 
   // enable the ADC for DMA
   ADC1_GC |= ADC_GC_DMAEN | ADC_GC_ADCO;
+#if 0
+  ADC1_CFG = ADC_CFG_AVGS(0) | ADC_CFG_REFSEL(0) | ADC_CFG_ADHSC |
+             ADC_CFG_ADSTS(0) |  ADC_CFG_ADIV(0) | //ADC_CFG_ADLPC | ADC_CFG_ADLSMP |
+             ADC_CFG_MODE(1) | ADC_CFG_ADICLK(3);  // hi speed 10-bit
+#endif
 
   PRREG(ADC1_GC);
   PRREG(ADC1_HC0);
   PRREG(ADC1_CFG);
   Serial.printf("buff addr %x\n", (uint32_t)rx_buffer);
+
 
   // set up a DMA channel to store the ADC data
   dma.begin(true); // Allocate the DMA channel first
@@ -48,8 +54,9 @@ void setupADC(int pin)
 
   dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
   dma.triggerAtHardwareEvent(DMAMUX_SOURCE_ADC1);
-  dma.enable();
+
   dma.attachInterrupt(isr);
+  dma.enable();
 
   ADC1_GC |= ADC_GC_ADACKEN;
   ADC1_HC0 = 7;   // need pin_to_channel table analog.c
@@ -60,6 +67,7 @@ void isr(void)
 {
   dma.clearInterrupt();
   ticks++;
+  asm volatile ("dsb");
 }
 
 void setup()
@@ -72,7 +80,7 @@ void setup()
 void loop()
 {
   static int prev;
-
+  arm_dcache_delete(rx_buffer, sizeof(rx_buffer));  // needed for DMAMEM ?
   Serial.printf("%d ticks A0 = %d \n", ticks - prev, rx_buffer[13]);
   prev = ticks;
   delay(2000);
