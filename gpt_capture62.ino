@@ -16,6 +16,7 @@ void setup() {
   analogWriteFrequency(14, 100);  // test with PWM
   analogWrite(14, 128); // jumper pwm 14  to pin 15  Serial3 on T4B2 breakout
   // Connect GPS 1PPS signal to pin 15 (GPIO_AD_B1_03)
+  IOMUXC_GPT2_IPP_IND_CAPIN1_SELECT_INPUT = 1;  // remap GPT2 capture 1
   IOMUXC_SW_MUX_CTL_PAD_GPIO_AD_B1_03 = 8; // GPT2 Capture1
   IOMUXC_SW_PAD_CTL_PAD_GPIO_AD_B1_03 = 0x13000; //Pulldown & Hyst
   CCM_CCGR0 |= CCM_CCGR0_GPT2_BUS(CCM_CCGR_ON) |
@@ -49,7 +50,7 @@ void capture() {
   if (index >= LEN) index = 0;
   list[index++] = n;
   count++;
- // GPIO2_DR_TOGGLE = (1 << 3);  // 1050
+  // GPIO2_DR_TOGGLE = (1 << 3);  // 1050
   if (index == LEN) {
     uint32_t sum = 0;
     for (int i = 0; i < LEN; i++) {
@@ -60,7 +61,7 @@ void capture() {
 }
 
 void loop() {
-#if 1
+#if 0
   Serial.println(ticks);
   delay(1000);
 #endif
