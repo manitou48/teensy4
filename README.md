@@ -10,6 +10,7 @@ dcptst.ino   |    DCP proof-of-principle, SHA256, CRC32, and AES
 flexiopwm.ino |    flexio PWM 400mhz clock?
 gpsgpt.ino   |    measure crystal drift of 24mhz and 32khz crystal with GPT
 gpt_capture.ino | GPT1 input capture of GPS PPS signal, drift check 24mhz or 32khz
+gpt_capture62.ino | GPT2 input capture of GPS PPS signal, drift check 24mhz or 32khz
 gpt_count.ino   | GPT1 clocked from pin 25, like FreqCount
 gpt_micros.ino |  GPT1 micros (core micros only 10 us res)
 pitxbaradc.ino |  clock ADC reads with PIT via XBAR
