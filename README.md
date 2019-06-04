@@ -7,6 +7,7 @@ adcdma.ino   |    continuous ADC and DMA
 adcdmapit.ino|    try to add DMA to PIT+XBAR+ADC_ETC+ADC  not working
 cachetst     |    cache/no-cache from stack, OCRAM, PROGMEM
 dcptst.ino   |    DCP proof-of-principle, SHA256, CRC32, and AES 
+eeprom_meta |  meta data for emulated EEPROM in flash, wear leveling
 flexiopwm.ino |    flexio PWM 400mhz clock?
 gpsgpt.ino   |    measure crystal drift of 24mhz and 32khz crystal with GPT
 gpt_capture.ino | GPT1 input capture of GPS PPS signal, drift check 24mhz or 32khz
