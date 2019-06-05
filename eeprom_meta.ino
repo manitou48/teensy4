@@ -7,30 +7,36 @@
 static uint16_t sector_index[FLASH_SECTORS];
 
 void ee_init() {
-  uint32_t sector;
+  uint32_t sector, addr, offset;
 
   for (sector = 0; sector < FLASH_SECTORS; sector++) {
     const uint16_t *p = (uint16_t *)(FLASH_BASEADDR + sector * 4096);
     const uint16_t *end = (uint16_t *)(FLASH_BASEADDR + (sector + 1) * 4096);
-    uint16_t index = 0;
+    uint16_t index = 0, val, last_val = 0xffff;
     do {
-      if (*p++ == 0xFFFF) break;
+      val = *p++;
+      if (val == 0xFFFF) break;
       index++;
+      last_val = val;
     } while (p < end);
     sector_index[sector] = index;
-    Serial.printf("sector %d  index %d\n", sector, index);
+    Serial.printf("sector %d  index %d", sector, index);
+    if (index) {
+      offset = last_val & 255;
+      addr = 4 * sector + 60 * (offset >> 2) + (offset & 3);
+      Serial.printf("  last %d:%d", addr, last_val >> 8);
+    }
+    Serial.printf("\n");
+
   }
 }
 
 void eval(uint32_t addr) {
   uint32_t  sector, offset;
-  uint16_t *p, *end;
+
   sector = (addr >> 2) % FLASH_SECTORS;
   offset = (addr & 3) | (((addr >> 2) / FLASH_SECTORS) << 2);
-  p = (uint16_t *)(FLASH_BASEADDR + sector * 4096);
-  end = p + sector_index[sector];
-  Serial.printf("addr %d sector %d  offset %d  p %0x  end %0x\n",
-                addr, sector, offset, (uint32_t) p, (uint32_t) end);
+  Serial.printf("addr %d sector %d  offset %d \n", addr, sector, offset);
 }
 
 void ee_read(uint32_t addr) {
@@ -52,7 +58,7 @@ void ee_read(uint32_t addr) {
     index++;
   }
   *p--;
-  Serial.printf("ee byte %d: %d  sector %d offset %d  p %0x  last index %d cnt %d\n",
+  Serial.printf("ee addr:val %d:%d  sector %d offset %d  p %0x  last index %d cnt %d\n",
                 addr, EEPROM.read(addr), sector, offset, (uint32_t)p, last_index, cnt);
 }
 
@@ -61,9 +67,10 @@ void sector_dump(uint32_t sector) {
   uint32_t   index = 0;
   uint16_t *p, *end;
 
-  Serial.printf("sector %d  end %d\n", sector, sector_index[sector]);
   p = (uint16_t *)(FLASH_BASEADDR + sector * 4096);
   end = p + sector_index[sector];
+  Serial.printf("sector %d  end %d  0x%0x to 0x%0x\n",
+                sector, sector_index[sector], (uint32_t)p, (uint32_t)p + 4095 );
   while (p < end) {
     uint32_t val;
     Serial.printf("%04d  ", index);
@@ -80,8 +87,10 @@ void sector_dump(uint32_t sector) {
 void setup() {
   Serial.begin(9600);
   while (!Serial);
-  Serial.printf("EEPROM lth %d\n", EEPROM.length());
- // EEPROM.write(1050,0x12);
+  uint32_t bytes = 4096 * (FLASH_SECTORS + 1);
+  Serial.printf("EEPROM lth %d flash %d sectors %d bytes  0x%0x to 0x%0x\n",
+                EEPROM.length(), FLASH_SECTORS + 1, bytes, FLASH_BASEADDR, FLASH_BASEADDR + bytes - 1);
+  // EEPROM.write(1050,0x12);
   ee_init();
   eval(0);
   eval(60);
