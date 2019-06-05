@@ -23,7 +23,7 @@ void ee_init() {
     Serial.printf("sector %d  index %d", sector, index);
     if (index) {
       offset = last_val & 255;
-      addr = 4 * sector + 60 * (offset >> 2) + (offset & 3);
+      addr = 4 * sector + 4 * FLASH_SECTORS * (offset >> 2) + (offset & 3);
       Serial.printf("  last %d:%d", addr, last_val >> 8);
     }
     Serial.printf("\n");
