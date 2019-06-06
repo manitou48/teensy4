@@ -83,6 +83,26 @@ void sector_dump(uint32_t sector) {
   }
 }
 
+void sector_report(uint32_t sector) {
+  uint32_t offset, val, cnts[256];
+  uint16_t *p, *end;
+  uint8_t  vals[256];
+  int i;
+
+  for (i = 0; i < sizeof(vals); i++) cnts[i] = vals[i] = 0;
+  Serial.printf("sector %d index %d\n", sector, sector_index[sector]);
+  p = (uint16_t *)(FLASH_BASEADDR + sector * 4096);
+  end = p + sector_index[sector];
+  while (p < end) {
+    val = *p++;
+    cnts[val & 255]++;
+    vals[val & 255] = val >> 8;  // last value
+  }
+  for (i = 0; i < sizeof(vals); i++) {
+    uint32_t addr = 4 * sector + 4 * FLASH_SECTORS * (i >> 2) + (i & 3);
+    if (cnts[i]) Serial.printf("offset %d  %d:%d  count %d\n", i, addr, vals[i], cnts[i]);
+  }
+}
 
 void setup() {
   Serial.begin(9600);
@@ -106,6 +126,15 @@ void setup() {
   ee_read(1050);
   sector_dump(0);
   sector_dump(7);
+  sector_dump(10);
+  sector_report(10);
+#if 0
+  for (int i = 0; i < 50; i++) {
+    EEPROM.write(40, i);
+    delay(5);
+  }
+  // need to update sector index table
+#endif
 }
 
 void loop() {
