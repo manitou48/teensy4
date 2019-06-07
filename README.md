@@ -23,6 +23,7 @@ spidma.ino     |  SPI DMA transmit
 spidma2.ino    |  SPI DMA transmit and receive
 sysinfo.ino    |  teensy 4 core registers
 trng.ino       |  hardware TRNG example, 512 bits in 52 ms
+wav2mqs.ino    |  SD WAV files to T4 MQS
 
 --------
 Some performance comparisons at
