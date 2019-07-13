@@ -1,10 +1,10 @@
-// GPT ISR test, run at 1mhz from 24mhz clock
+// GPT ISR test, run at 1mhz from 24mhz clock, test either GPT1 or GPT2
 //  could do PWM with OCRn registers, but no GPT output pins on T4
 
 volatile uint32_t ticks;
 
 void gpt1_isr() {
-  GPT1_SR |= GPT_SR_OF3;
+  GPT1_SR |= GPT_SR_OF3;  // clear all set bits
   ticks++;
   while (GPT1_SR & GPT_SR_OF1); // wait for clear
 }
@@ -22,7 +22,7 @@ void gpt1_init(uint32_t us) {
 }
 
 void gpt2_isr() {
-  GPT2_SR |= GPT_SR_OF3;
+  GPT2_SR |= GPT_SR_OF3;  // clear all set bits
   ticks++;
   // while (GPT2_SR & GPT_SR_OF1); // wait for clear
   asm volatile ("dsb");
