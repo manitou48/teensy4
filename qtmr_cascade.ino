@@ -61,7 +61,7 @@ void cascade() {
 
 void chain() {
   // CH0 tick every 1 us, clock 150mhz/150
-  // CH1 clocked from CH0 ticks, count 1000 micros
+  // CH1 clocked from CH0 ticks, count 65536 micros
   // CH2 clocked from CH1 ticks, count ms  rollover 65000
 
   int cnt;
@@ -124,7 +124,7 @@ void setup()   {
 uint32_t prev = micros();
 void loop()
 {
-  if (micros() - prev > 1000000) {
+  if (micros() - prev >= 1000000) {
     uint32_t us = TMRx->CH[1].CNTR + 65536 * TMRx->CH[2].HOLD; // could count second chnl 3
     Serial.printf("%d ticks %d ms   %d us %d\n", ticks, isrms, us, micros());
     prev = micros();
