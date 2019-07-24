@@ -15,8 +15,20 @@ void setup() {
   while (!Serial);
   delay(1000);
 
-  analogWriteFrequency(11, 5000);  // test jumper 11 to 19
+  analogWriteFrequency(11, 60000000);  // test jumper 11 to 19
   analogWrite(11, 128);
+  // pin 10 PWM
+  TMR1_CTRL0 = 0;  // stop  timer
+  TMR1_SCTRL0 = TMR_SCTRL_OEN; // output enable
+  TMR1_CNTR0 = 0;
+  TMR1_LOAD0 = 0;
+  TMR1_CMPLD10 = 1 - 1;
+  TMR1_CSCTRL0 = TMR_CSCTRL_CL1(1);
+  TMR1_CTRL0 =  TMR_CTRL_CM(1) | TMR_CTRL_PCS(8 ) | TMR_CTRL_LENGTH | TMR_CTRL_OUTMODE(3);
+
+  //configure Teensy pin Compare output
+  IOMUXC_SW_MUX_CTL_PAD_GPIO_B0_00 = 1;
+
   CCM_CCGR6 |= CCM_CCGR6_QTIMER3(CCM_CCGR_ON); //enable QTMR3
 
   IOMUXC_SW_MUX_CTL_PAD_GPIO_AD_B1_00 = 1;    // QT3 Timer0 on pin 19
