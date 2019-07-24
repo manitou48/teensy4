@@ -15,7 +15,7 @@ void setup() {
   while (!Serial);
   delay(1000);
 
-  analogWriteFrequency(11, 60000000);  // test jumper 11 to 19
+  analogWriteFrequency(11, 50000000);  // test jumper 11 to 19
   analogWrite(11, 128);
   // pin 10 PWM
   TMR1_CTRL0 = 0;  // stop  timer
@@ -25,7 +25,6 @@ void setup() {
   TMR1_CMPLD10 = 1 - 1;
   TMR1_CSCTRL0 = TMR_CSCTRL_CL1(1);
   TMR1_CTRL0 =  TMR_CTRL_CM(1) | TMR_CTRL_PCS(8 ) | TMR_CTRL_LENGTH | TMR_CTRL_OUTMODE(3);
-
   //configure Teensy pin Compare output
   IOMUXC_SW_MUX_CTL_PAD_GPIO_B0_00 = 1;
 
@@ -55,7 +54,7 @@ void setup() {
 }
 
 void loop() {
-  if (micros() - us > 1000000) {
+  if (micros() - us >= 1000000) {
     uint32_t ticks = TMRx->CH[0].CNTR + 65536 * TMRx->CH[1].HOLD; // atomic
     us = micros();
     Serial.println(ticks - prev);
