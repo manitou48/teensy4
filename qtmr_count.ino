@@ -5,7 +5,16 @@
 #define PRREG(x) Serial.print(#x" 0x"); Serial.println(x,HEX)
 IMXRT_TMR_t * TMRx = (IMXRT_TMR_t *)&IMXRT_TMR3;
 
-uint32_t us, prev;
+uint32_t prev;
+
+volatile uint32_t ticks, dataReady;
+
+IntervalTimer it1;
+
+void it1cb() {
+  ticks = TMRx->CH[0].CNTR | TMRx->CH[1].HOLD << 16; // atomic
+  dataReady = 1;
+}
 
 
 void setup() {
@@ -22,8 +31,7 @@ void setup() {
   TMR1_SCTRL0 = TMR_SCTRL_OEN; // output enable
   TMR1_CNTR0 = 0;
   TMR1_LOAD0 = 0;
-  TMR1_CMPLD10 = 1 - 1;
-  TMR1_CSCTRL0 = TMR_CSCTRL_CL1(1);
+  TMR1_CMPLD10 = 1 - 1;    // 75 mhz
   TMR1_CTRL0 =  TMR_CTRL_CM(1) | TMR_CTRL_PCS(8 ) | TMR_CTRL_LENGTH | TMR_CTRL_OUTMODE(3);
   //configure Teensy pin Compare output
   IOMUXC_SW_MUX_CTL_PAD_GPIO_B0_00 = 1;
@@ -50,15 +58,14 @@ void setup() {
 
   TMRx->CH[0].CTRL = TMR_CTRL_CM(1) | TMR_CTRL_PCS(0) | TMR_CTRL_LENGTH ;
 
-  us = micros();
+  it1.begin(it1cb, 1000000);  // microseconds
 }
 
 void loop() {
-  if (micros() - us >= 1000000) {
-    uint32_t ticks = TMRx->CH[0].CNTR + 65536 * TMRx->CH[1].HOLD; // atomic
-    us = micros();
+  if (dataReady) {
     Serial.println(ticks - prev);
     prev = ticks;
+    dataReady = 0;
   }
 
 }
