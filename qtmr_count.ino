@@ -1,5 +1,5 @@
 // count ticks from external pin with  QTIMER4 chnl 2  pin 9 GPIO_B0_11
-// test with PWM on pin 11   jumper to 9 SCL
+// test with PWM on pin 8   jumper to 9
 
 #define PRREG(x) Serial.print(#x" 0x"); Serial.println(x,HEX)
 IMXRT_TMR_t * TMRx = (IMXRT_TMR_t *)&IMXRT_TMR4;
@@ -14,7 +14,6 @@ void it1cb() {
   dataReady = 1;
 }
 
-
 void setup() {
   int cnt;
 
@@ -22,21 +21,12 @@ void setup() {
   while (!Serial);
   delay(1000);
 
-  analogWriteFrequency(11, 50000000);  // test jumper 11 to 9
-  analogWrite(11, 128);
-  // pin 10 PWM
-  TMR1_CTRL0 = 0;  // stop  timer
-  TMR1_SCTRL0 = TMR_SCTRL_OEN; // output enable
-  TMR1_CNTR0 = 0;
-  TMR1_LOAD0 = 0;
-  TMR1_CMPLD10 = 1 - 1;    // 75 mhz
-  TMR1_CTRL0 =  TMR_CTRL_CM(1) | TMR_CTRL_PCS(8 ) | TMR_CTRL_LENGTH | TMR_CTRL_OUTMODE(3);
-  IOMUXC_SW_MUX_CTL_PAD_GPIO_B0_00 = 1;      // pin 10 ALT1
+  analogWriteFrequency(8, 50000000);  // test jumper 8 to 9, max 75mhz
+  analogWrite(8, 128);
 
   CCM_CCGR6 |= CCM_CCGR6_QTIMER4(CCM_CCGR_ON); //enable QTMR4
 
   IOMUXC_SW_MUX_CTL_PAD_GPIO_B0_11 = 1;    // QT4 Timer2 on pin 9
-
 
   cnt = 65536 ; // full cycle
   TMRx->CH[2].CTRL = 0; // stop
@@ -64,5 +54,4 @@ void loop() {
     prev = ticks;
     dataReady = 0;
   }
-
 }
