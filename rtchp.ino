@@ -1,7 +1,7 @@
 // T4 RTC  32khz crystal  HPSRTC   start and sync HPRTC
 //  subsecond periodic alarm 1/32768 to 1 second
 #include <time.h>
-extern void *__rtc_localtime; // Arduino build process sets this, boards.txt
+//extern void *__rtc_localtime; // Arduino build process sets this, boards.txt
 #define PRREG(x) Serial.print(#x" 0x"); Serial.println(x,HEX)
 
 #define SNVS_DEFAULT_PGD_VALUE (0x41736166U)
@@ -114,7 +114,7 @@ void setup() {
   while (!Serial);
   delay(2000);
   rtc_init();
-  rtc_set_time((uint32_t)&__rtc_localtime);   //LPSRTC will start at 0 otherwise  1547051415;
+//  rtc_set_time((uint32_t)&__rtc_localtime);   //LPSRTC will start at 0 otherwise  1547051415;
   time_t tt = rtc_secs();
   Serial.printf("time set to %s\n", ctime(&tt));
   rtc_initAlarm();
