@@ -18,6 +18,7 @@ gpt_count.ino   | GPT1 clocked from pin 25, like FreqCount
 gpt_isr.ino  |  GPT2 compare interrupt
 gpt_micros.ino |  GPT1 micros (core micros only 10 us res)
 gpt_pwm.ino | GPT2 @150mhz PWM to pin 16
+pit_micros64.ino | free running PIT timer 64-bit microseconds
 pitxbaradc.ino |  clock ADC reads with PIT via XBAR
 qtmr_capture.ino |quad timer capture
 qtmr_cascade.ino | cascade or chain quad timer channels
