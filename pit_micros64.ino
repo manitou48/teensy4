@@ -1,4 +1,4 @@
-// PIT timer free running  24mhz clock  64-bit cycle count
+// PIT lifetime timer free running  24mhz clock  64-bit cycle count
 // chain chn 1 to chn 0
 //  teensy4 uses PIT for IntervalTimer
 
@@ -24,6 +24,11 @@ uint64_t pit_cycles() {
   volatile uint32_t valueL;
   valueH = PIT_LTMR64H;   //  no rollover
   valueL = PIT_LTMR64L;
+  // NXP errata workaround
+  if (valueL == IMXRT_PIT_CHANNELS[0].LDVAL) {
+    valueH = PIT_LTMR64H;
+    valueL = PIT_LTMR64L;
+  }
   return ~((valueH << 32) | valueL);   // invert for up counting
 }
 
