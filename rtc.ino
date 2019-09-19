@@ -1,6 +1,8 @@
 // T4 RTC  32khz crystal  LPSRTC   start and sync HPRTC too ?
 #include <time.h>
 //extern void *__rtc_localtime; // Arduino build process sets this, boards.txt
+// latest: T4 bootloader sets RTC time
+// SNVS_LPSRTCLR gives subsecond values, counts 32768 ticks/sec
 
 #define SNVS_DEFAULT_PGD_VALUE (0x41736166U)
 #define SNVS_LPSR_PGD_MASK                       (0x8U)
