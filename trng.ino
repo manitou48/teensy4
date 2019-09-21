@@ -95,6 +95,8 @@ typedef struct {
   __I  uint32_t VID2;                              /**< Version ID Register (LS), offset: 0xF4 */
 } TRNG_Type;
 
+static uint32_t rng_index;
+
 void trng_init() {
   CCM_CCGR6 |= CCM_CCGR6_TRNG(CCM_CCGR_ON);
   // program mode
@@ -121,6 +123,15 @@ void trng512(uint32_t *udata) {
   for (int i = 0; i < TRNG_ENT_COUNT; i++) udata[i] = TRNG->ENT[i];
   // reading last ENT word will start a new entropy cycle
   uint32_t tmp = TRNG->ENT[0];  // dummy read work-around from SDK
+}
+
+uint32_t trng_word() {
+  uint32_t r;
+  while ((TRNG->MCTL & TRNG_MCTL_ENT_VAL_MASK) == 0 &
+         (TRNG->MCTL & TRNG_MCTL_ERR_MASK) == 0) ; // wait for entropy ready
+  r = TRNG->ENT[rng_index++];
+  if (rng_index >= TRNG_ENT_COUNT) rng_index = 0;
+  return r;
 }
 
 void logger() {
@@ -173,6 +184,16 @@ void entropy(uint32_t *w, int bytes) {
   Serial.println();
 }
 
+void words() {
+  uint32_t x, us, i = 0;
+  while (1) {
+    us = micros();
+    x = trng_word();
+    us = micros() - us;
+    Serial.printf("%d %08x %d us\n", i++, x, us);
+  }
+}
+
 
 void setup() {
   Serial.begin(9600);
@@ -184,6 +205,7 @@ void setup() {
   uint32_t * p = (uint32_t *) TRNG;
   for (int i = 0; i < 16; i++) Serial.printf("%d %08X\n", i, p[i]);
   //logger();  // log to serial
+  //words();  // timing test
 }
 
 void loop() {
