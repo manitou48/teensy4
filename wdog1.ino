@@ -20,6 +20,7 @@ void wdog1_init() {
 
 void wdog1_reset() {
   WDOG1_WCR &= ~WDOG_WCR_SRS;
+  // SCB_AIRCR = 0x05FA0004;  // does reset too, reported as TOUT
 }
 
 void wdog1_feed() {
