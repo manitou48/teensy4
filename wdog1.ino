@@ -11,7 +11,6 @@ void wdog1_isr() {
 }
 
 void wdog1_init() {
-  // WDOG1_WICR = 0;  // no interrupts for now
   WDOG1_WMCR = 0;   // disable power down PDE
   uint8_t wt = 20;  //  10.5 secs reset timeout
   WDOG1_WCR |=  (wt << 8) | WDOG_WCR_WDE | WDOG_WCR_WDT | WDOG_WCR_SRE;
