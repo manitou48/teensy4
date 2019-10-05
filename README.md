@@ -31,6 +31,7 @@ spidma2.ino    |  SPI DMA transmit and receive
 sysinfo.ino    |  teensy 4 core registers
 trng.ino       |  hardware TRNG example, 512 bits in 52 ms
 wav2mqs.ino    |  SD WAV files to T4 MQS
+wdog1.ino    |  exercise WDOG1 like SDK, ok 1050, hangs 1060
 
 --------
 Some performance comparisons at
