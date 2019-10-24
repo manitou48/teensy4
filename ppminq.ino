@@ -3,11 +3,12 @@
 // QTIMER1   pin capture test  qtmr 1 ch 2  pin 11 B0_02,  ch 52
 // free-running 16-bit timer
 // QTIMER oflow interrupt no workee,  use 0xffff compare for 32-bit
+// polarity TMR_SCTRL_IPS
 #define PRREG(x) Serial.printf(#x" 0x%x\n",x);
 
 #define PULSEPOSITION_MAXCHANNELS 16
-uint32_t pulse_width[PULSEPOSITION_MAXCHANNELS];
-uint32_t pulse_buffer[PULSEPOSITION_MAXCHANNELS];
+uint32_t pulse_width[PULSEPOSITION_MAXCHANNELS+1];
+uint32_t pulse_buffer[PULSEPOSITION_MAXCHANNELS+1];
 uint32_t write_index, prev, total_channels;
 
 #define CLOCKS_PER_MICROSECOND (150./4)  // pcs 8+2
