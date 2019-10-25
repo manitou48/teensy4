@@ -68,6 +68,7 @@ void capture_init() {
   attachInterruptVector(IRQ_QTIMER1, my_isr);
   TMR1_SCTRL2 |= TMR_SCTRL_IEFIE;  // enable compare interrupt
   TMR1_CSCTRL2 = TMR_CSCTRL_TCF1EN;  // enable capture interrupt
+  NVIC_SET_PRIORITY(IRQ_QTIMER1, 32);
   NVIC_ENABLE_IRQ(IRQ_QTIMER1);
   TMR1_CTRL2 =  TMR_CTRL_CM(1) | TMR_CTRL_PCS(8 + 2) | TMR_CTRL_SCS(2) | TMR_CTRL_LENGTH ; // prescale
   *(portConfigRegister(11)) = 1;  // ALT 1
