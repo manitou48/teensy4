@@ -21,7 +21,7 @@ gpt_pwm.ino | GPT2 @150mhz PWM to pin 16
 pit_micros64.ino | free running PIT timer 64-bit microseconds
 pitxbaradc.ino |  clock ADC reads with PIT via XBAR
 ppminq.ino | PPM input like PulsePosition quadtimer
-ppmoutq.ino | PPM output like PulsePosition quadtimer (not working)
+ppmoutq.ino | PPM output like PulsePosition quadtimer
 qtmr_capture.ino |quad timer capture
 qtmr_cascade.ino | cascade or chain quad timer channels
 qtmr_count.ino    |  quad timer count external pulses and chain to 32 bits

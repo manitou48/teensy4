@@ -1,4 +1,3 @@
-//  ??? not quite working ???
 //  PPM out on pin 10
 // QTIMER1  test  qtmr 1 ch 0  pin 10 B0_00, F_BUS_ACTUAL 150 mhz
 //  v2  switch CTRL OUTMODE between clear and set
@@ -35,7 +34,7 @@ void my_isr() {
 
   if (state == 0) {
     // pin was just set high, schedule it to go low
-    TMR1_CMPLD10 = TX_PULSE_WIDTH_CLOCKS;
+    TMR1_COMP10 = TMR1_CMPLD10 = TX_PULSE_WIDTH_CLOCKS;
     TMR1_CTRL0 =  CTRL_CLEAR;
     state = 1;
   } else {
@@ -66,11 +65,11 @@ void my_isr() {
       width = pulse_remaining;
     }
     if (width <= 60000) {
-      TMR1_CMPLD10 = width;
+      TMR1_COMP10 = TMR1_CMPLD10 = width;
       TMR1_CTRL0 =  CTRL_SET; // set on compare match & interrupt
       state = 0;
     } else {
-      TMR1_CMPLD10 = 58000;
+      TMR1_COMP10 = TMR1_CMPLD10 = 58000;
       TMR1_CTRL0 =  CTRL_CLEAR; // clear on compare match & interrupt
       pulse_remaining = width - 58000;
       state = 2;
@@ -97,6 +96,7 @@ void qtmr_init() {
   attachInterruptVector(IRQ_QTIMER1, my_isr);
   TMR1_CSCTRL0 &= ~(TMR_CSCTRL_TCF1);  // clear
   TMR1_CSCTRL0 |= TMR_CSCTRL_TCF1EN;  // enable interrupt
+  NVIC_SET_PRIORITY(IRQ_QTIMER1, 32);
   NVIC_ENABLE_IRQ(IRQ_QTIMER1);
   TMR1_CTRL0 =  CTRL_SET;
   *(portConfigRegister(10)) = 1;  // ALT 1
@@ -132,9 +132,6 @@ bool ppmOut_write(uint8_t channel, float microseconds)
 }
 
 void setup()   {
-  Serial.begin(9600);
-  while (!Serial);
-  delay(1000);
 
   CCM_CCGR6 |= CCM_CCGR6_QTIMER1(CCM_CCGR_ON);
 
@@ -145,20 +142,8 @@ void setup()   {
   ppmOut_write(3, 759.24);
   // slots 4 and 5 will default to 1500 us
   ppmOut_write(6, 1234.56);
-
-  PRREG(TMR1_SCTRL0);
-  PRREG(TMR1_CSCTRL0);
-  PRREG(TMR1_CTRL0);
-  PRREG(TMR1_LOAD0);
-  PRREG(TMR1_COMP10);
-  PRREG(TMR1_CMPLD10);
-  for (int i = 0; i <= total_channels; i++) Serial.printf("%d %d\n", i, pulse_width[i]);
 }
 
 void loop() {
-  Serial.println(ticks);
-  PRREG(TMR1_CMPLD10);
-  Serial.printf("total_channels %d state %d remaining %u\n",
-                total_channels, state, pulse_remaining);
-  delay(1000);
+
 }
