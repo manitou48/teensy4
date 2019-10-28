@@ -44,7 +44,7 @@ void my_isr() {  // capture and compare
       }
       write_index = 0;
     } else {
-      if (write_index < PULSEPOSITION_MAXCHANNELS) {
+      if (write_index <= PULSEPOSITION_MAXCHANNELS) {
         pulse_width[write_index++] = count;
       }
     }
