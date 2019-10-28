@@ -7,8 +7,8 @@
 #define PRREG(x) Serial.printf(#x" 0x%x\n",x);
 
 #define PULSEPOSITION_MAXCHANNELS 16
-uint32_t pulse_width[PULSEPOSITION_MAXCHANNELS+1];
-uint32_t pulse_buffer[PULSEPOSITION_MAXCHANNELS+1];
+uint32_t pulse_width[PULSEPOSITION_MAXCHANNELS + 1];
+uint32_t pulse_buffer[PULSEPOSITION_MAXCHANNELS + 1];
 uint32_t write_index, prev, total_channels;
 
 #define CLOCKS_PER_MICROSECOND (150./4)  // pcs 8+2
@@ -44,7 +44,7 @@ void my_isr() {  // capture and compare
       }
       write_index = 0;
     } else {
-      if (write_index <= PULSEPOSITION_MAXCHANNELS) {
+      if (write_index < PULSEPOSITION_MAXCHANNELS) {
         pulse_width[write_index++] = count;
       }
     }
