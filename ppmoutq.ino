@@ -25,7 +25,7 @@ uint32_t pulse_width[PULSEPOSITION_MAXCHANNELS + 1];
 uint32_t pulse_buffer[PULSEPOSITION_MAXCHANNELS + 1];
 
 uint32_t state, total_channels, total_channels_buffer, pulse_remaining,
-         current_channel, *framePinReg;
+         current_channel, framePin = 255;
 
 volatile uint32_t ticks;
 void my_isr() {
@@ -52,12 +52,11 @@ void my_isr() {
       if (++channel > total_channels_buffer) {
         channel = 0;
       }
-      if (framePinReg) {
-        //if (channel == 0) {
+      if (framePin < NUM_DIGITAL_PINS) {
         if (channel == 1) {
-          //TODO      FRAME_PIN_SET();
+          digitalWrite(framePin,HIGH);
         } else {
-          //TODO     FRAME_PIN_CLEAR();
+          digitalWrite(framePin,LOW);
         }
       }
       current_channel = channel;
@@ -84,6 +83,11 @@ void qtmr_init() {
   TMR1_CNTR0 = 0;
   TMR1_LOAD0 = 0;
 
+ //  framePin = 2;   // optional select a framePin
+  if (framePin < NUM_DIGITAL_PINS) {
+    pinMode(framePin,OUTPUT);
+    digitalWrite(framePin,HIGH);
+  }
   TMR1_COMP10 = 200;  // first time
   state = 0;
   pulse_width[0] = TX_MINIMUM_FRAME_CLOCKS;
@@ -117,7 +121,7 @@ bool ppmOut_write(uint8_t channel, float microseconds)
   if (sum < TX_MINIMUM_FRAME_CLOCKS - TX_MINIMUM_SPACE_CLOCKS) {
     space = TX_MINIMUM_FRAME_CLOCKS - sum;
   } else {
-    if (framePinReg) {
+    if (framePin < NUM_DIGITAL_PINS) {
       space = TX_PULSE_WIDTH_CLOCKS;
     } else {
       space = TX_MINIMUM_SPACE_CLOCKS;
