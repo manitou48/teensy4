@@ -1,9 +1,10 @@
 // PPM in, report pulse widths
 //  test with PulsePosition output pin 9 to T4 pin 8
 // flexpwm 1 3 PWM1_A3   pin 8 B1_00 on 1062 ALT 6 daisy
-// free-running 16-bit timer
+// free-running 16-bit timer,  150mhz/4
 
 #define PRREG(x) Serial.printf(#x" 0x%x\n",x);
+#define MMASK (1<<3)   // module mask 3 for PWM1_A3
 
 #define PULSEPOSITION_MAXCHANNELS 16
 uint32_t pulse_width[PULSEPOSITION_MAXCHANNELS + 1];
@@ -25,9 +26,10 @@ void pwm1_3_isr() {
     overflow_inc = true;
   }
   if (FLEXPWM1_SM3STS &  FLEXPWM_SMSTS_CFA0) {
+    uint32_t val, count;
     FLEXPWM1_SM3STS = FLEXPWM_SMSTS_CFA0;   // capture clear
-    vals[k++] =  FLEXPWM1_SM3CVAL2;
-    val = TMR1_CAPT2;
+
+    val = FLEXPWM1_SM3CVAL2;
     count = overflow_count;
     if (val > 0xE000 && overflow_inc) count--;
     val |= (count << 16);
@@ -54,23 +56,27 @@ void pwm1_3_isr() {
 }
 
 void capture_init() {
-  CCM_CCGR6 |= CCM_CCGR6_QTIMER1(CCM_CCGR_ON);
-
-  TMR1_CTRL2 = 0; // stop
-  TMR1_LOAD2 = 0;
-  TMR1_CSCTRL2 = 0;
-  TMR1_LOAD2 = 0;  // start val after compare
-  TMR1_COMP12 = 0xffff;  // count up to this val, interrupt,  and start again
-  TMR1_CMPLD12 = 0xffff;
-
-  TMR1_SCTRL2 = TMR_SCTRL_CAPTURE_MODE(1);  //rising
-  attachInterruptVector(IRQ_QTIMER1, my_isr);
-  TMR1_SCTRL2 |= TMR_SCTRL_IEFIE;  // enable compare interrupt
-  TMR1_CSCTRL2 = TMR_CSCTRL_TCF1EN;  // enable capture interrupt
-  NVIC_SET_PRIORITY(IRQ_QTIMER1, 32);
-  NVIC_ENABLE_IRQ(IRQ_QTIMER1);
-  TMR1_CTRL2 =  TMR_CTRL_CM(1) | TMR_CTRL_PCS(8 + 2) | TMR_CTRL_SCS(2) | TMR_CTRL_LENGTH ; // prescale
-  *(portConfigRegister(11)) = 1;  // ALT 1
+  FLEXPWM1_FCTRL0 |= FLEXPWM_FCTRL0_FLVL(MMASK);  // clear
+  FLEXPWM1_FSTS0 = FLEXPWM_FSTS0_FFLAG(MMASK);    //clear
+  FLEXPWM1_MCTRL |= FLEXPWM_MCTRL_CLDOK(MMASK);
+  FLEXPWM1_SM3CTRL2 = FLEXPWM_SMCTRL2_INDEP;
+  FLEXPWM1_SM3CTRL = FLEXPWM_SMCTRL_FULL | FLEXPWM_SMCTRL_PRSC(2);
+  FLEXPWM1_SM3INIT = 0;
+  FLEXPWM1_SM3VAL0 = 0;
+  FLEXPWM1_SM3VAL1 = 0xffff;
+  FLEXPWM1_SM3VAL2 = 0;
+  FLEXPWM1_SM3VAL3 = 0;
+  FLEXPWM1_SM3VAL4 = 0;
+  FLEXPWM1_SM3VAL5 = 0;
+  FLEXPWM1_MCTRL |= FLEXPWM_MCTRL_LDOK(MMASK) | FLEXPWM_MCTRL_RUN(MMASK);
+  FLEXPWM1_SM3CAPTCTRLA = FLEXPWM_SMCAPTCTRLA_EDGA0(2) | FLEXPWM_SMCAPTCTRLA_ARMA;
+  IOMUXC_SW_MUX_CTL_PAD_GPIO_B1_00 = 6 | 0x10;  // ALT6
+  IOMUXC_FLEXPWM1_PWMA3_SELECT_INPUT = 4;   // daisy
+  attachInterruptVector(IRQ_FLEXPWM1_3, pwm1_3_isr);
+  FLEXPWM1_SM3STS = FLEXPWM_SMSTS_CFA0 | FLEXPWM_SMSTS_RF ;
+  FLEXPWM1_SM3INTEN = FLEXPWM_SMINTEN_CA0IE | FLEXPWM_SMINTEN_RIE;
+  NVIC_SET_PRIORITY(IRQ_FLEXPWM4_0, 48);
+  NVIC_ENABLE_IRQ(IRQ_FLEXPWM1_3);
 }
 
 int ppmIn_available() {
@@ -106,15 +112,6 @@ void setup()   {
   write_index = 255;
   available_flag = false;
   capture_init();
-
-  PRREG(TMR1_SCTRL2);
-  PRREG(TMR1_CSCTRL2);
-  PRREG(TMR1_CTRL2);
-  PRREG(TMR1_LOAD2);
-  PRREG(TMR1_COMP12);
-  PRREG(TMR1_CMPLD12);
-  PRREG(TMR1_COMP22);
-  PRREG(TMR1_CMPLD22);
 }
 
 void loop() {
