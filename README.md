@@ -20,6 +20,7 @@ gpt_micros.ino |  GPT1 micros (core micros only 10 us res)
 gpt_pwm.ino | GPT2 @150mhz PWM to pin 16
 pit_micros64.ino | free running PIT timer 64-bit microseconds
 pitxbaradc.ino |  clock ADC reads with PIT via XBAR
+ppminf.ino | PPM input like PulsePosition flexpwm timer
 ppminq.ino | PPM input like PulsePosition quadtimer
 ppmoutq.ino | PPM output like PulsePosition quadtimer
 qtmr_capture.ino |quad timer capture
