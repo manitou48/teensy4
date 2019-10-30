@@ -63,6 +63,16 @@ void oflows() {
   NVIC_ENABLE_IRQ(IRQ_QTIMER1);
 }
 
+void underflows() {  // count down
+  TMR1_CTRL0 = 0; // stop
+  TMR1_LOAD0 = 0;  // start val after compare
+  TMR1_CSCTRL0 = 0;
+  TMR1_CTRL0 = TMR_CTRL_DIR | TMR_CTRL_CM(1) | TMR_CTRL_PCS(8 + 2)  ; // prescale
+  attachInterruptVector(IRQ_QTIMER1, oflow_isr);
+  TMR1_SCTRL0 = TMR_SCTRL_TOFIE ;  // enable oflow interrupt
+  NVIC_ENABLE_IRQ(IRQ_QTIMER1);
+}
+
 void pwm4_init() {  // T4 default PWM freq
   uint32_t modulo, high, low;
   TMR1_CTRL0 = 0; // stop
@@ -123,7 +133,7 @@ void setup()   {
   delay(1000);
 #if 0
   // analogWriteFrequency(10, 10000);
-  analogWrite(10, 128);
+  analogWrite(10, 128);  // set pin 10 mode for PWM tests
   PRREG(TMR1_SCTRL0);
   PRREG(TMR1_CSCTRL0);
   PRREG(TMR1_CTRL0);
@@ -138,7 +148,8 @@ void setup()   {
   //isr_init(20000);   // hz
   // pwm_sdk(50, 1000);  // duty, hz    pin 10
   // oflows();   // ? TOF not working ??
-  rollover();
+  underflows();  // count down TOF
+  //rollover();
 
   PRREG(TMR1_SCTRL0);
   PRREG(TMR1_CSCTRL0);
