@@ -58,7 +58,6 @@ void capture_init() {
   CCM_CCGR6 |= CCM_CCGR6_QTIMER1(CCM_CCGR_ON);
 
   TMR1_CTRL2 = 0; // stop
-  TMR1_LOAD2 = 0;
   TMR1_CSCTRL2 = 0;
   TMR1_LOAD2 = 0;  // start val after compare
   TMR1_COMP12 = 0xffff;  // count up to this val, interrupt,  and start again
@@ -66,8 +65,8 @@ void capture_init() {
 
   TMR1_SCTRL2 = TMR_SCTRL_CAPTURE_MODE(1);  //rising
   attachInterruptVector(IRQ_QTIMER1, my_isr);
-  TMR1_SCTRL2 |= TMR_SCTRL_IEFIE;  // enable compare interrupt
-  TMR1_CSCTRL2 = TMR_CSCTRL_TCF1EN;  // enable capture interrupt
+  TMR1_SCTRL2 |= TMR_SCTRL_IEFIE;  // enable capture interrupt
+  TMR1_CSCTRL2 = TMR_CSCTRL_TCF1EN;  // enable compare interrupt
   NVIC_SET_PRIORITY(IRQ_QTIMER1, 32);
   NVIC_ENABLE_IRQ(IRQ_QTIMER1);
   TMR1_CTRL2 =  TMR_CTRL_CM(1) | TMR_CTRL_PCS(8 + 2) | TMR_CTRL_SCS(2) | TMR_CTRL_LENGTH ; // prescale
