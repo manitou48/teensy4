@@ -38,6 +38,9 @@ wav2mqs.ino    |  SD WAV files to T4 MQS
 wdog1.ino    |  exercise WDOG1 like SDK, ok 1050, hangs 1060
 
 --------
+![coremark](coremark.png)
+![coremark power](coremarka.png)
+
 Some performance comparisons at
 
    https://github.com/manitou48/DUEZoo
