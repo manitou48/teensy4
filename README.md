@@ -32,6 +32,7 @@ rtc.ino        |  RTC off of 32 khz crystal
 rtchp.ino      |  HP RTC off of 32 khz crystal, periodic sub-second alarm
 spidma.ino     |  SPI DMA transmit
 spidma2.ino    |  SPI DMA transmit and receive
+spiperf.ino   |  SPI loopback test
 sysinfo.ino    |  teensy 4 core registers
 trng.ino       |  hardware TRNG example, 512 bits in 52 ms
 wav2mqs.ino    |  SD WAV files to T4 MQS
