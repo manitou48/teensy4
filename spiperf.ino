@@ -1,5 +1,6 @@
 // t4 spi
-//  bus 528/7  75 mhz  max SPI 75/2 37.5 mhz
+//  bus 528/7 mhz     max SPI 528/7/2 37.7 mhz
+// 1.49-beta3  max SPI 720/3/2  120mhz
 // jumper MISO to MOSI for err check
 
 #include <SPI.h>
