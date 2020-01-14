@@ -46,4 +46,10 @@ Some performance comparisons at
 
    https://github.com/manitou48/DUEZoo
 
+   https://forum.pjrc.com/threads/54711-Teensy-4-0-First-Beta-Test?p=194187&viewfull=1#post194187 float DSP
+
+   https://forum.pjrc.com/threads/54711-Teensy-4-0-First-Beta-Test?p=210782&viewfull=1#post210782
+
+   https://forum.pjrc.com/threads/54711-Teensy-4-0-First-Beta-Test?p=211593&viewfull=1#post211593  crypto
+
    https://github.com/manitou48/crystals   teensy 3 RTC tuning
