@@ -2,9 +2,7 @@
 // clock(1) 24mhz   clock(4) 32khz   set  CLKSRC
 // clock(5) doesn't tick
 
-#include "Arduino.h"
-
-#define CLKSRC 1     // 1 or 4
+#define CLKSRC 4     // 1 or 4
 #if CLKSRC == 1
 #define TPS 1000000
 #define PREDIV 23
