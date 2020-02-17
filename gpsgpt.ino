@@ -30,8 +30,7 @@ void setup() {
   while (!Serial);
   delay(3000);
   Serial.println("starting");
-  CCM_CCGR1 |= CCM_CCGR1_GPT(CCM_CCGR_ON) |
-               CCM_CCGR1_GPT_SERIAL(CCM_CCGR_ON);  // enable GPT1 module
+  CCM_CCGR1 |= CCM_CCGR1_GPT(CCM_CCGR_ON) ;  // enable GPT1 module
   GPT1_CR = 0;
   GPT1_PR = PREDIV;   // prescale+1 /1 for 32k,  /24 for 24mhz   /24 clock 1
   GPT1_SR = 0x3F; // clear all prior status
