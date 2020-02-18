@@ -1,8 +1,14 @@
 // Teensy 4  EEPROM meta data  wear leveling flash
 #include <EEPROM.h>
+#if defined(ARDUINO_TEENSY40)
 #define FLASH_BASEADDR 0x601F0000
 #define FLASH_SECTORS 15
 #define E2END 0x437
+#elif defined(ARDUINO_TEENSY41)
+#define FLASH_BASEADDR 0x607C0000
+#define FLASH_SECTORS 63
+#define E2END 0x10BB
+#endif
 
 static uint16_t sector_index[FLASH_SECTORS];
 
@@ -121,10 +127,14 @@ void setup() {
   eval(1079);
   ee_read(0);
   ee_read(1);
+  ee_read(2);
+  ee_read(3);
+  ee_read(4);
   ee_read(60);
   ee_read(61);
   ee_read(1050);
   sector_dump(0);
+  sector_dump(1);
   sector_dump(7);
   sector_dump(10);
   sector_report(10);
