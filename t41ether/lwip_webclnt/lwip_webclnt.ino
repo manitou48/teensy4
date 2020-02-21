@@ -187,7 +187,7 @@ void setup()
 
   while (!netif_is_link_up(netif_default)) loop(); // await on link up
 
-  web_client("GET /index.html \n\n");
+  web_client("GET /index.html\r\n");
 
 
 #if 0
