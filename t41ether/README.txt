@@ -13,3 +13,4 @@ teensy41.build.flags.common=-g -Wall -ffunction-sections -fdata-sections -nostdl
 
   (alter for your home directory ...)
 
+TODO: fetch MAC address from internal fuses
