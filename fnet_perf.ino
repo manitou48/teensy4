@@ -206,34 +206,32 @@ void tcp_send() {
 }
 
 void tcp_recv() {
-  long t1, n, bytes = 0;;
-  EthernetClient sender;
-  float mbs;
-
   Serial.printf("TCP server listening port %d\n", TTCP_PORT);
   server.begin();
-  while (! ( sender = server.available()) ) {}   // await connect
+  while (1) {
+    long t1, n, bytes = 0;;
+    float mbs;
 
-  t1 = millis();
-  while (sender.connected()) {
-    if ((n = sender.available()) > 0) {
+    EthernetClient sender = server.available();
+    if (sender) {
+      t1 = millis();
+      while (sender.connected()) {
+        if ((n = sender.available()) > 0) {
 
-      if (n > RECLTH)  n = RECLTH;
-      sender.read(packetBuffer, n);
-      bytes += n;
+          if (n > RECLTH)  n = RECLTH;
+          sender.read(packetBuffer, n);
+          bytes += n;
+        }
+      }
+      t1 = millis() - t1;
+      mbs = 8 * bytes * .001 / t1;
+      Serial.printf("recv  %ld bytes %ld ms %f  mbs ", bytes, t1, mbs);
+      Serial.print("from "); Serial.println(sender.remoteIP());
+      Serial.println("awaiting connect");
+      delay(10);
+      sender.stop();
     }
   }
-  t1 = millis() - t1;
-  mbs = 8 * bytes * .001 / t1;
-  Serial.printf("recv  %ld bytes %ld ms %f  mbs ", bytes, t1, mbs);
-  sender.flush();
-  sender.stop();
-#if 0
-  IPAddress remote;
-  getRemoteIP(&sender, &remote[0]);
-  Serial.print("from "); Serial.println(remote);
-#endif
-
 }
 
 
