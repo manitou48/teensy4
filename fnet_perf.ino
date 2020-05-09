@@ -18,15 +18,14 @@
 #define PRREG(x) Serial.printf(#x" 0x%x\n",x)
 #define swap4 __builtin_bswap32
 
-#define REPS 10
-
-
 // Enter a MAC address for your controller below.
 // Newer Ethernet shields have a MAC address printed on a sticker on the shield
 static byte mac[6] = {0x0A, 0x1B, 0x3C, 0x4D, 0x5E, 0x6F};
 IPAddress ip(192, 168, 1, 17);
 
-#define NBYTES 100000
+#define REPS 10
+
+#define NBYTES 1000000
 #define RECLTH 1000
 #define TTCP_PORT 5001
 EthernetServer server(TTCP_PORT);
@@ -36,7 +35,7 @@ EthernetClient client;
 unsigned int localPort = 8888;      // local port to listen for UDP packets
 unsigned int dstport = 7654;      //  dst port
 
-IPAddress udpServer(192, 168, 1, 4);
+IPAddress MyServer(192, 168, 1, 4);
 
 #define PACKET_SIZE 1024
 
@@ -49,7 +48,7 @@ void udp_echo() {
   uint32_t  t1, t2;
   static int lost = 0; // for static ip, first pkt not sent?
   t1 = micros();
-  Udp.beginPacket(udpServer, dstport);   //uechosrv
+  Udp.beginPacket(MyServer, dstport);   //uechosrv
   Udp.write(packetBuffer, 8);
   Udp.endPacket();
 
@@ -67,20 +66,19 @@ void udp_echo() {
   Serial.println(t2);
 }
 
-void udp_send() {
+void udp_send(int reps, int nbytes) {
   uint32_t  i, t1, t2;
   float mbs;
 
   t1 = micros();
-  for (i = 0; i < 1000; i++) {
-    Udp.beginPacket(udpServer, 2000);   // to udpsink
-    Udp.write(packetBuffer, 8);
+  for (i = 0; i < reps; i++) {
+    Udp.beginPacket(MyServer, 2000);   // to udpsink
+    Udp.write(packetBuffer, nbytes);
     Udp.endPacket();
   }
   t2 = micros() - t1;
-  mbs = (8000.*REPS) / t2;
-  Serial.print(mbs); Serial.print(" mbs  ");
-  Serial.println(t2);
+  mbs = (8.*nbytes * reps) / t2;
+  Serial.printf("UDP blast %d reps %d bytes %d us %f mbs\n", reps, nbytes, t2, mbs);
 }
 
 void udp_recv() {
@@ -131,7 +129,7 @@ void uvdelay(int cnt, int lth) {
 
   for (i = 0; i < cnt; i++) {
     t1 = micros();
-    Udp.beginPacket(udpServer, 7654);   // to uechosrv
+    Udp.beginPacket(MyServer, 7654);   // to uechosrv
     Udp.write(packetBuffer, lth);
     Udp.endPacket();
     while ((n = Udp.parsePacket()) == 0) ;  // spin, timeout ?
@@ -159,7 +157,7 @@ void udp_ntp() {
   static uint32_t us0 = 0, secs0, nus0;
   while (1) {
     packetBuffer[0] = 0x1b;   // ntp query
-    Udp.beginPacket(udpServer, 123);
+    Udp.beginPacket(MyServer, 123);
     Udp.write(packetBuffer, 48);
     Udp.endPacket();
     rtt = micros();
@@ -188,9 +186,8 @@ void udp_ntp() {
 void tcp_send() {
   long t1, i, bytes = 0, n, sndlth;
   float mbs;
-  char str[64];
 
-  if (!client.connect(udpServer, TTCP_PORT)) {
+  if (!client.connect(MyServer, TTCP_PORT)) {
     Serial.println("connect failed");
     return;
   }
@@ -204,19 +201,16 @@ void tcp_send() {
   client.stop();
   t1 = millis() - t1;
   mbs = 8 * NBYTES * .001 / t1;
-  sprintf(str, "send  %ld bytes %ld ms  mbs ", bytes, t1);
-  Serial.print(str);
-  Serial.println(mbs);
+  Serial.printf( "send  %ld bytes %ld ms  %f mbs\n", bytes, t1, mbs);
 
 }
 
 void tcp_recv() {
   long t1, n, bytes = 0;;
-  char str[64];
   EthernetClient sender;
   float mbs;
 
-  Serial.println("server listening");
+  Serial.printf("TCP server listening port %d\n", TTCP_PORT);
   server.begin();
   while (! ( sender = server.available()) ) {}   // await connect
 
@@ -231,9 +225,7 @@ void tcp_recv() {
   }
   t1 = millis() - t1;
   mbs = 8 * bytes * .001 / t1;
-  sprintf(str, "recv  %ld bytes %ld ms n %d  mbs ", bytes, t1, n);
-  Serial.print(str);
-  Serial.println(mbs);
+  Serial.printf("recv  %ld bytes %ld ms %f  mbs ", bytes, t1, mbs);
   sender.flush();
   sender.stop();
 #if 0
@@ -301,13 +293,13 @@ void setup()
 void loop()
 {
   // udp_echo();
-  //udp_send();
+  //udp_send(20,1000);   // blast  pps 1000,8
   // udp_recv();
   // uechosrv();
   //uvdelay(10, 8);
   // udp_ntp();
-  //  tcp_send();
+  //tcp_send();
   tcp_recv();
-  // wait
-  delay(5000);
+
+  delay(5000);   // wait
 }
