@@ -234,6 +234,34 @@ void tcp_recv() {
   }
 }
 
+void tcp_echo(int eport) {
+  EthernetServer eserver(eport);
+  Serial.printf("TCP echo server listening port %d\n", eport);
+  eserver.begin();
+  while (1) {
+    long records = 0, n, bytes = 0;;
+
+
+    EthernetClient sender = eserver.available();
+    if (sender) {
+      while (sender.connected()) {
+        if ((n = sender.available()) > 0) {
+          if (n > RECLTH)  n = RECLTH;
+          sender.read(packetBuffer, n);
+          sender.write(packetBuffer, n); //  echo
+          bytes += n;
+          records++;
+        }
+      }
+
+      Serial.printf("%ld records   %ld bytes ", records, bytes);
+      Serial.print("from "); Serial.println(sender.remoteIP());
+      Serial.println("awaiting connect");
+      delay(10);
+      sender.stop();
+    }
+  }
+}
 
 void hexdump(uint8_t *p, int lth) {
   char str[16];
@@ -298,6 +326,7 @@ void loop()
   // udp_ntp();
   //tcp_send();
   tcp_recv();
+  // tcp_echo(7);
 
   delay(5000);   // wait
 }
