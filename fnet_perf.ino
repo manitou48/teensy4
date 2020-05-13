@@ -39,7 +39,7 @@ IPAddress MyServer(192, 168, 1, 4);
 
 byte packetBuffer[ PACKET_SIZE]; //buffer to hold incoming and outgoing packets
 
-uint8_t mac[6];
+static uint8_t mac[6];
 static void teensyMAC(uint8_t *mac)
 {
   uint32_t m1 = HW_OCOTP_MAC1;   // T4 MAC
