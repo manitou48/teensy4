@@ -18,9 +18,7 @@
 #define PRREG(x) Serial.printf(#x" 0x%x\n",x)
 #define swap4 __builtin_bswap32
 
-// Enter a MAC address for your controller below.
-// Newer Ethernet shields have a MAC address printed on a sticker on the shield
-static byte mac[6] = {0x0A, 0x1B, 0x3C, 0x4D, 0x5E, 0x6F};
+
 IPAddress ip(192, 168, 1, 17);
 
 #define REPS 10
@@ -40,6 +38,20 @@ IPAddress MyServer(192, 168, 1, 4);
 #define PACKET_SIZE 1024
 
 byte packetBuffer[ PACKET_SIZE]; //buffer to hold incoming and outgoing packets
+
+uint8_t mac[6];
+static void teensyMAC(uint8_t *mac)
+{
+  uint32_t m1 = HW_OCOTP_MAC1;   // T4 MAC
+  uint32_t m2 = HW_OCOTP_MAC0;
+  mac[0] = m1 >> 8;
+  mac[1] = m1 >> 0;
+  mac[2] = m2 >> 24;
+  mac[3] = m2 >> 16;
+  mac[4] = m2 >> 8;
+  mac[5] = m2 >> 0;
+}
+
 
 // A UDP instance to let us send and receive packets over UDP
 EthernetUDP Udp;
@@ -307,6 +319,7 @@ void setup()
 {
   Serial.begin(9600);
   while (!Serial);
+  teensyMAC(mac);
   // start Ethernet and UDP
   Ethernet.begin(mac);
   prregs();
