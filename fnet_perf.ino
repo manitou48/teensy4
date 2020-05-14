@@ -318,6 +318,9 @@ void prregs() {
 void setup()
 {
   Serial.begin(9600);
+  Ethernet.setStackHeap(1024 * 64);
+  Ethernet.setSocketSize(1460 * 4); //Set buffer size
+  Ethernet.setSocketNum(6); //Change number of allowed sockets to 6
   while (!Serial);
   teensyMAC(mac);
   // start Ethernet and UDP
