@@ -12,6 +12,7 @@ dcptst.ino   |    DCP proof-of-principle, SHA256, CRC32, and AES
 eeprom_meta |  meta data for emulated EEPROM in flash, wear leveling
 flexiopwm.ino |    flexio PWM 400mhz clock?
 fnet_perf.ino |  FNET TCP/UDP test using arduino API
+fnet_tftpd  | FNET tftp server with SD lib adn BUILTIN_SDCARD
 gpsgpt.ino   |    measure crystal drift of 24mhz and 32khz crystal with GPT
 gpt_capture.ino | GPT1 input capture (1050) of GPS PPS signal, drift check 24mhz or 32khz
 gpt_capture62.ino | GPT2 input capture (1060) of GPS PPS signal, drift check 24mhz or 32khz
