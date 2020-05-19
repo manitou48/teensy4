@@ -90,8 +90,8 @@ void setup() {
   Ethernet.begin(mac);
   Serial.print("IP  address:");
   Serial.println(Ethernet.localIP());
-  tftp_init(&tftp_ctx);
   Serial.println("tftp server");
+  tftp_init(&tftp_ctx);
 }
 
 void loop() {
