@@ -105,10 +105,8 @@ void trng_init() {
 
   // config regs ...
   TRNG->MCTL &= ~TRNG_MCTL_SAMP_MODE_MASK; // vonneuman  SDK
-  uint32_t * p = (uint32_t *) TRNG;
-  for (int i = 0; i < 16; i++) Serial.printf("%d %08X\n", i, p[i]);
-  // run mode
-  TRNG->MCTL = MASKVAL((TRNG_MCTL_PRGM_MASK | TRNG_MCTL_ERR_MASK), TRNG_MCTL_PRGM(0));
+  // run mode  sample mode 2
+  TRNG->MCTL =  MASKVAL((TRNG_MCTL_PRGM_MASK | TRNG_MCTL_ERR_MASK), TRNG_MCTL_PRGM(0)) | 2;
   uint32_t tmp = TRNG->ENT[TRNG_ENT_COUNT - 1]; // start gen cycle
 }
 
@@ -204,6 +202,7 @@ void setup() {
   PRREG(TRNG->MCTL);
   uint32_t * p = (uint32_t *) TRNG;
   for (int i = 0; i < 16; i++) Serial.printf("%d %08X\n", i, p[i]);
+  Serial.println((uint32_t)TRNG, HEX);
   //logger();  // log to serial
   //words();  // timing test
 }
