@@ -2,10 +2,10 @@
 // clock(1) 24mhz   clock(4) 32khz   set  CLKSRC
 // clock(5) doesn't tick
 
-#define CLKSRC 4     // 1 or 4
+#define CLKSRC 1     // 1 or 4
 #if CLKSRC == 1
-#define TPS 1000000
-#define PREDIV 23
+#define TPS 4000000
+#define PREDIV 5
 #elif CLKSRC == 4
 #define TPS 32768
 #define PREDIV 0
@@ -43,9 +43,9 @@ void loop() {
   if (tick)  {
     if (prev != 0) {
       int d = ticks - prev;
-      int ppm = 1000000 * (d - TPS) / TPS;
+      float ppm = 1000000. * (d - TPS) / TPS;
       sum += ppm;
-      Serial.printf("%d secs %d ticks  %d  %.1f ppm\n", n, d, ppm, sum / n);
+      Serial.printf("%d secs %d ticks  %.2f  %.2f ppm  %.1f C\n", n, d, ppm, sum / n, tempmonGetTemp());
       n++;
     }
     tick = 0;
