@@ -56,12 +56,12 @@ static void teensyMAC(uint8_t *mac)
 // A UDP instance to let us send and receive packets over UDP
 EthernetUDP Udp;
 
-void udp_echo() {
+void udp_echo(int nbytes) {
   uint32_t  t1, t2;
   static int lost = 0; // for static ip, first pkt not sent?
   t1 = micros();
   Udp.beginPacket(MyServer, dstport);   //uechosrv
-  Udp.write(packetBuffer, 8);
+  Udp.write(packetBuffer, nbytes);
   Udp.endPacket();
 
   while (!Udp.parsePacket()) {
@@ -73,7 +73,7 @@ void udp_echo() {
     }
   }
   // We've received a packet, read the data from it
-  Udp.read(packetBuffer, 8); // read the packet into the buffer
+  Udp.read(packetBuffer, sizeof(packetBuffer)); // read the packet into the buffer
   t2 = micros() - t1;
   Serial.println(t2);
 }
@@ -334,7 +334,7 @@ void setup()
 
 void loop()
 {
-  // udp_echo();
+  // udp_echo(8);
   //udp_send(20,1000);   // blast  pps 1000,8
   // udp_recv();
   // uechosrv();
