@@ -18,6 +18,7 @@ gpsgpt.ino   |    measure crystal drift of 24mhz and 32khz crystal with GPT
 gpt_capture.ino | GPT1 input capture (1050) of GPS PPS signal, drift check 24mhz or 32khz
 gpt_capture62.ino | GPT2 input capture (1060) of GPS PPS signal, drift check 24mhz or 32khz
 gpt_count.ino   | GPT1 clocked from pin 25, like FreqCount
+gpt2_count.ino   | GPT2 clocked from pin 14, like FreqCount
 gpt_isr.ino  |  GPT2 compare interrupt
 gpt_micros.ino |  GPT1 micros (core micros only 10 us res)
 gpt_pwm.ino | GPT2 @150mhz PWM to pin 16
