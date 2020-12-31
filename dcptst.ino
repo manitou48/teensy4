@@ -484,7 +484,7 @@ void DCP_HASH_Update(dcp_hash_ctx_t *ctx, const uint8_t *input, size_t inputSize
 {
   bool isUpdateState;
   dcp_hash_ctx_internal_t *ctxInternal;
-  size_t blockSize;
+  size_t blockSize = DCP_HASH_BLOCK_SIZE;
 
   ctxInternal = (dcp_hash_ctx_internal_t *)ctx;
   ctxInternal->fullMessageSize += inputSize;
