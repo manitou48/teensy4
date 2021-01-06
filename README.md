@@ -32,6 +32,7 @@ qtmr_capture.ino |quad timer capture
 qtmr_cascade.ino | cascade or chain quad timer channels
 qtmr_count.ino    |  quad timer count external pulses and chain to 32 bits
 qtmrtst.ino    |  quad timer counting and PWM tests
+qtmrxpwm.ino | quad timer slow PWM with XBAR
 rtc.ino        |  RTC off of 32 khz crystal
 rtchp.ino      |  HP RTC off of 32 khz crystal, periodic sub-second alarm
 spidma.ino     |  SPI DMA transmit
