@@ -189,8 +189,9 @@ void udp_ntp() {
       Serial.print(ctime(&edt));
     }
     double t = 1000000 * (secs - secs0) + (nus - nus0); // elapsed remote us
-    Serial.printf("ntp %u.%06d  rtt %d us   %.0f ppm over %d s\n",
-                  secs, nus, rtt, (1000000. * ((us - us0) - t)) / t, secs - secs0);
+    double ppm = (1000000. * ((us - us0) - t)) / t;
+    Serial.printf("ntp %u.%06d  rtt %d us   %.2f ppm over %d s\n",
+                  secs, nus, rtt, ppm, secs - secs0);
     delay(10000);
   }
 }
