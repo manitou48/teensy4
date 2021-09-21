@@ -182,7 +182,7 @@ void udp_ntp() {
     uint64_t x = swap4(*(uint32_t *) (packetBuffer + 44));
     nus = (1000000 * x) >> 32;
     if (us0 == 0) {
-      us0 = us;
+      us0 = us;       // rollover after 4295 secs
       secs0 = secs;
       nus0 = nus;
       time_t edt = secs - 2208988800 - 4 * 3600; // NTP 1990 to unix 1970 and EDT
