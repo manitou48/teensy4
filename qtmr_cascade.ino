@@ -1,5 +1,5 @@
 // QTIMER4 cascade  test   F_BUS_ACTUAL 150 mhz, 50% duty  ch 53
-// 16-bit counter, chain with 3 channels, count us
+// 16-bit counter, chain with 4 channels, chain count 48-bit us
 
 #define PRREG(x) Serial.print(#x" 0x"); Serial.println(x,HEX)
 
@@ -79,12 +79,18 @@ void chain() {
   TMRx->CH[1].COMP1 = cnt - 1;
   TMRx->CH[1].CMPLD1 = cnt - 1;
   TMRx->CH[1].CTRL = TMR_CTRL_CM(7) | TMR_CTRL_PCS(4) | TMR_CTRL_LENGTH ;  //clock from clock 0
-  cnt = 0; //  count ms
+
   TMRx->CH[2].CTRL = 0; // stop
   TMRx->CH[2].LOAD = 0;  // start val after compare
-  TMRx->CH[2].COMP1 = cnt  ;
-  TMRx->CH[2].CMPLD1 = cnt ;
+  TMRx->CH[2].COMP1 = cnt - 1  ;
+  TMRx->CH[2].CMPLD1 = cnt - 1;
   TMRx->CH[2].CTRL = TMR_CTRL_CM(7) | TMR_CTRL_PCS(5)  ;  //clock from clock 1
+
+  TMRx->CH[3].CTRL = 0; // stop
+  TMRx->CH[3].LOAD = 0;  // start val after compare
+  TMRx->CH[3].COMP1 = cnt - 1 ;
+  TMRx->CH[3].CMPLD1 = cnt - 1;
+  TMRx->CH[3].CTRL = TMR_CTRL_CM(7) | TMR_CTRL_PCS(6)  ;  //clock from clock 2
 }
 
 void setup()   {
@@ -96,7 +102,7 @@ void setup()   {
 
   // pick a test
   //  cascade();
-  chain();
+  chain();    // 48-bit micros
   // isr_init(20000);   // hz
 
   PRREG(TMRx->CH[0].CTRL);
@@ -124,9 +130,15 @@ void setup()   {
 uint32_t prev = micros();
 void loop()
 {
-  if (micros() - prev >= 1000000) {
-    uint32_t us = TMRx->CH[1].CNTR + 65536 * TMRx->CH[2].HOLD; // could count second chnl 3
-    Serial.printf("%d ticks %d ms   %d us %d\n", ticks, isrms, us, micros());
+  if (micros() - prev >= 2000000) {
+    uint32_t us;
+    // us = TMRx->CH[1].CNTR + 65536 * TMRx->CH[2].HOLD; // could count second chnl 3
+    // Serial.printf("%u ticks %u ms   %u us %u\n", ticks, isrms, us, micros());
     prev = micros();
+    us = TMRx->CH[1].CNTR;
+    Serial.printf("chain ch1 %u ch2 %u ch3 %u\n", us, TMRx->CH[2].HOLD, TMRx->CH[3].HOLD);
+    uint64_t us48 = 123;
+    us48 = us + 65536LL * TMRx->CH[2].HOLD + 65536LL * 65536LL * TMRx->CH[3].HOLD;
+    Serial.printf("us48 %llu  us\n", us48);
   }
 }
