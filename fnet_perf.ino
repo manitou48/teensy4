@@ -204,7 +204,7 @@ void tcp_send() {
     Serial.println("connect failed");
     return;
   }
-  t1 = millis();
+  t1 = micros();
   while (bytes < NBYTES) {
     sndlth = NBYTES - bytes;
     if (sndlth > RECLTH) sndlth = RECLTH;
@@ -212,9 +212,9 @@ void tcp_send() {
     bytes += n;
   }
   client.stop();
-  t1 = millis() - t1;
-  mbs = 8 * NBYTES * .001 / t1;
-  Serial.printf( "send  %ld bytes %ld ms  %f mbs\n", bytes, t1, mbs);
+  t1 = micros() - t1;
+  mbs = 8 * NBYTES / t1;
+  Serial.printf( "send  %ld bytes %ld us  %f mbs\n", bytes, t1, mbs);
 
 }
 
@@ -224,10 +224,12 @@ void tcp_recv() {
   while (1) {
     long t1, n, bytes = 0;;
     float mbs;
+    IPAddress remote;
 
     EthernetClient sender = server.available();
     if (sender) {
-      t1 = millis();
+      remote = sender.remoteIP();
+      t1 = micros();
       while (sender.connected()) {
         if ((n = sender.available()) > 0) {
 
@@ -236,10 +238,10 @@ void tcp_recv() {
           bytes += n;
         }
       }
-      t1 = millis() - t1;
-      mbs = 8 * bytes * .001 / t1;
-      Serial.printf("recv  %ld bytes %ld ms %f  mbs ", bytes, t1, mbs);
-      Serial.print("from "); Serial.println(sender.remoteIP());
+      t1 = micros() - t1;
+      mbs = 8 * bytes  / t1;
+      Serial.printf("recv  %ld bytes %ld us %f  mbs ", bytes, t1, mbs);
+      Serial.print("from "); Serial.println(remote);
       Serial.println("awaiting connect");
       delay(10);
       sender.stop();
