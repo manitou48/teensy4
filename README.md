@@ -12,6 +12,7 @@ dcptst.ino   |    DCP proof-of-principle, SHA256, CRC32, and AES
 eeprom_meta |  meta data for emulated EEPROM in flash, wear leveling
 flexiopwm.ino |    flexio PWM 400mhz clock?
 fnet_perf.ino |  FNET TCP/UDP test using arduino API
+fnet_tftp  | FNET tftp client, read or write from tftp server
 fnet_tftpd  | FNET tftp server with SD lib adn BUILTIN_SDCARD
 fnet_tftpd_SPIFFS  | FNET tftp server with SPIFFS on EFLASH
 gpsgpt.ino   |    measure crystal drift of 24mhz and 32khz crystal with GPT
