@@ -13,7 +13,7 @@ eeprom_meta |  meta data for emulated EEPROM in flash, wear leveling
 flexiopwm.ino |    flexio PWM 400mhz clock?
 fnet_perf.ino |  FNET TCP/UDP test using arduino API
 fnet_tftp  | FNET tftp client, read or write from tftp server
-fnet_tftpd  | FNET tftp server with SD lib adn BUILTIN_SDCARD
+fnet_tftpd  | FNET tftp server with SD lib and BUILTIN_SDCARD
 fnet_tftpd_SPIFFS  | FNET tftp server with SPIFFS on EFLASH
 gpsgpt.ino   |    measure crystal drift of 24mhz and 32khz crystal with GPT
 gpt_capture.ino | GPT1 input capture (1050) of GPS PPS signal, drift check 24mhz or 32khz
@@ -29,6 +29,7 @@ ppminf.ino | PPM input like PulsePosition flexpwm timer
 ppmoutf.ino | PPM outpu like PulsePosition flexpwm timer NOT working
 ppminq.ino | PPM input like PulsePosition quadtimer
 ppmoutq.ino | PPM output like PulsePosition quadtimer
+QNEtftpd | QNEthernet tftp server with SD lib
 qtmr_capture.ino |quad timer capture
 qtmr_cascade.ino | cascade or chain quad timer channels
 qtmr_count.ino    |  quad timer count external pulses and chain to 32 bits
