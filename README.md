@@ -5,6 +5,7 @@ Early beta tests were with IMXRT1052, final Teensy 4 is IMXRT1062
 Files | Description
 ---|---
 acmpdac.ino  |    ACMP3 and internal 6-bit DAC example
+acmpxbar.ino |    ACMP3 out rerouted to pin 2 with XBAR
 adcdma.ino   |    continuous ADC and DMA
 adcdmapit.ino|    try to add DMA to PIT+XBAR+ADC_ETC+ADC  not working
 cachetst     |    cache/no-cache from stack, OCRAM, PROGMEM
