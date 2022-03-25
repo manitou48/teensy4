@@ -22,8 +22,7 @@ void setup() {
   CMP3_CR1 = CMP_CR1_ENABLE | CMP_CR1_OPE ;   // enable
   CMP3_DACCR = DACCR_ENABLE | DACCR_VIN2 | DACCR_VOSEL(32);  //3v3/2  VIN1 ok too
   //   output ACMP result HIGH or LOW
-  pinMode(26, OUTPUT);
-  IOMUXC_SW_MUX_CTL_PAD_GPIO_AD_B1_14 = 1;  // ALT 1 ACMP3_OUT
+  CORE_PIN26_CONFIG = 1;  // ALT 1 ACMP3_OUT
 }
 
 void loop() {
