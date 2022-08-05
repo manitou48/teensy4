@@ -73,13 +73,13 @@ void loop()
   if (Serial.available()) {
     uint32_t period, duty;
     while (Serial.available()) Serial.read();
-    update = 1;
     pd_index += 2;
     if (pd_index >= (sizeof(pd) / sizeof(pd[0]))) pd_index = 0;
     period = pd[pd_index];
     duty = pd[pd_index + 1];
     high = (period * duty) / 100;
     low = period - high;
+    update = 1;  // notify ISR
     Serial.printf("period %d low %d high %d \n", period, low, high);
   }
 }
