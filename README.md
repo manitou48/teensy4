@@ -34,6 +34,7 @@ QNEtftpd | QNEthernet tftp server with SD lib
 qtmr_capture.ino |quad timer capture
 qtmr_cascade.ino | cascade or chain quad timer channels
 qtmr_count.ino    |  quad timer count external pulses and chain to 32 bits
+qtmr_pwmvar.ino    |  quad timer variable PWM, change period and duty
 qtmrtst.ino    |  quad timer counting and PWM tests
 qtmrxpwm.ino | quad timer slow PWM with XBAR
 rtc.ino        |  RTC off of 32 khz crystal

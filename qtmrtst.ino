@@ -116,11 +116,11 @@ void pwm_sdk(int duty, int hz) {  // from sdk fsl_qtmr.c
   TMR1_CNTR0 = 0;
   TMR1_LOAD0 = 0;
 
-  TMR1_COMP10 = low;
-  TMR1_CMPLD10 = low;
-  TMR1_COMP20 = high;
-  TMR1_CMPLD20 = high;
-  TMR1_SCTRL0 =  TMR_SCTRL_OPS | TMR_SCTRL_OEN ;//| TMR_SCTRL_VAL | TMR_SCTRL_FORCE;
+  TMR1_COMP10 = low - 1;
+  TMR1_CMPLD10 = low - 1;
+  TMR1_COMP20 = high - 1;
+  TMR1_CMPLD20 = high - 1;
+  TMR1_SCTRL0 =   TMR_SCTRL_OEN ;
   TMR1_CSCTRL0 = TMR_CSCTRL_CL1(2) | TMR_CSCTRL_CL2(1);
   TMR1_CTRL0 =  TMR_CTRL_CM(1) | TMR_CTRL_PCS(8 + pcs) | TMR_CTRL_LENGTH |
                 TMR_CTRL_OUTMODE(4);
