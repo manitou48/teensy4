@@ -1,5 +1,6 @@
 // T4 DCP  AES SHA CRC32
 //  tests on channel 0  non-blocking  no context switching
+// https://forum.pjrc.com/threads/54711-Teensy-4-0-First-Beta-Test?p=197722&viewfull=1#post197722
 
 // InputOutput  or just Input
 #define __IO volatile
