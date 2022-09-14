@@ -10,6 +10,7 @@ adcdma.ino   |    continuous ADC and DMA
 adcdmapit.ino|    try to add DMA to PIT+XBAR+ADC_ETC+ADC  not working
 cachetst     |    cache/no-cache from stack, OCRAM, PROGMEM
 dcptst.ino   |    DCP proof-of-principle, SHA256, CRC32, and AES 
+DSPbench.ino |   Teensy DSP benchmark arm_math.h v1.5.1
 eeprom_meta |  meta data for emulated EEPROM in flash, wear leveling
 flexiopwm.ino |    flexio PWM 400mhz clock?
 fnet_perf.ino |  FNET TCP/UDP test using arduino API
