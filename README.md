@@ -51,6 +51,7 @@ wdog1.ino    |  exercise WDOG1 like SDK, ok 1050, hangs 1060
 --------
 ![coremark](coremark.png)
 ![coremark power](coremarka.png)
+![coremark](corebar.png)
 
 Some performance comparisons at
 
