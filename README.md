@@ -57,6 +57,8 @@ Some performance comparisons at
 
    https://github.com/manitou48/DUEZoo
 
+   http://manitou48.github.io/ more plots
+
    https://forum.pjrc.com/threads/54711-Teensy-4-0-First-Beta-Test?p=194187&viewfull=1#post194187 float DSP
 
    https://forum.pjrc.com/threads/54711-Teensy-4-0-First-Beta-Test?p=210782&viewfull=1#post210782
