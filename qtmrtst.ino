@@ -127,6 +127,23 @@ void pwm_sdk(int duty, int hz) {  // from sdk fsl_qtmr.c
   *(portConfigRegister(10)) = 1;  // ALT 1
 }
 
+void fixed_pwm() {
+  // fixed PWM from ref manual, jumper pin 10 to pin 12 to count ticks
+  uint16_t pcs = 0;     // 150mhz/1  /2  /4  .... /128
+  uint16_t duty = 0x8000;   // 16-bit duty   50%   25%  0x4000
+  TMR1_CTRL0 = 0; // stop
+  TMR1_CNTR0 = 0;
+  TMR1_CSCTRL0 = 0;
+
+  TMR1_COMP10 = duty - 1;   // pinhigh on compare match
+  TMR1_CMPLD10 = duty - 1;
+  TMR1_LOAD0 = duty;      // restart count to rollover, pin low
+  TMR1_SCTRL0 = TMR_SCTRL_OEN | TMR_SCTRL_OPS;  //enable output pin, reverse polarity
+  TMR1_CTRL0 =  TMR_CTRL_CM(1) | TMR_CTRL_PCS(8 + pcs) | TMR_CTRL_LENGTH |
+                TMR_CTRL_OUTMODE(6);
+  *(portConfigRegister(10)) = 1;  // ALT 1
+}
+
 void setup()   {
   Serial.begin(9600);
   while (!Serial);
@@ -148,8 +165,9 @@ void setup()   {
   //isr_init(20000);   // hz
   // pwm_sdk(50, 1000);  // duty, hz    pin 10
   // oflows();   // ? TOF not working ??
-  underflows();  // count down TOF
+  //underflows();  // count down TOF
   //rollover();
+  fixed_pwm();     //150mhz/65536 = 2289 hz
 
   PRREG(TMR1_SCTRL0);
   PRREG(TMR1_CSCTRL0);
